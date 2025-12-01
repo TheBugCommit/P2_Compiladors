@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "utils/error.h"
 #include "utils/log.h"
+#include "codegen/codegen.h"
 
 extern int yyparse(void);
 extern FILE* yyin;
@@ -14,7 +15,8 @@ int main(int argc, char* argv[]) {
     
     error_init();
     log_init(argv[2]);
-    
+    code_init(stdout);
+
     FILE* input_file = fopen(argv[1], "r");
     if (!input_file) {
         SourceLocation loc = {0,0,argv[1]};
@@ -37,5 +39,10 @@ int main(int argc, char* argv[]) {
     fclose(input_file);
     log_close();
     
-    return has_errors() ? EXIT_FAILURE : EXIT_SUCCESS;
+    if (!has_errors()) {
+        emit_halt();
+        return EXIT_SUCCESS;
+    }else {
+        return EXIT_FAILURE;
+    }
 }
