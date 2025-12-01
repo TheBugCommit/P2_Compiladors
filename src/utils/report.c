@@ -7,7 +7,7 @@
 void print_value(ExprResult e) {
     switch (e.type) {
         case TYPE_INT:
-            printf("%lld", e.value.int_val);
+            printf("%d", e.value.int_val);
             break;
         case TYPE_FLOAT:
             printf("%g", e.value.float_val);

@@ -90,6 +90,14 @@ INT             {DIGIT}+
 "**"        { return TK_POW; }
 "("         { return TK_LPAREN; }
 ")"         { return TK_RPAREN; }
+"["         { return TK_LBRACKET; }
+"]"         { return TK_RBRACKET; }
+
+%{ /* Stroctures */ %}
+
+"repeat"    { return TK_REPEAT; }
+"do"        { return TK_DO; }
+"done"      { return TK_DONE; }
 
 %{ /* Literals */ %}
 

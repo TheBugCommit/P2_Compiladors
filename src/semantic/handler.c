@@ -6,31 +6,42 @@
 #include "../symtab/symtab.h"
 #include "../utils/error.h"
 #include "../utils/log.h"
-#include "./expression.h"
 #include "../utils/report.h"
+#include "./expression.h"
 #include "globals.h"
 
-void handle_simple_declaration(DATA_TYPE declared_type, StringListNode* list) {
-    StringListNode* current = list;
+void handle_simple_declaration(DATA_TYPE declared_type,
+                               DeclaratorListNode* list) {
+    DeclaratorListNode* current = list;
 
     while (current != NULL) {
         sym_value_type* new_entry = malloc(sizeof(sym_value_type));
         new_entry->type = declared_type;
         new_entry->is_initialized = 0;
 
+        new_entry->is_array = current->is_array;
+        new_entry->size = current->array_size;
+
         int result = sym_add(current->id, new_entry);
-        if (result == SYMTAB_DUPLICATE)
+        if (result == SYMTAB_DUPLICATE) {
             REPORT_SEMANTIC_ERROR(current_location(),
                                   "Identifier '%s' already declared",
                                   current->id);
-
-        log_production("Declared identifier: '%s' (Type: %s)", current->id,
-                       TYPE_NAME[declared_type]);
+            free(new_entry);
+        } else {
+            if (current->is_array) {
+                log_production("Declared ARRAY: '%s' [%d] (Type: %s)", 
+                               current->id, current->array_size, TYPE_NAME[declared_type]);
+            } else {
+                log_production("Declared VAR: '%s' (Type: %s)", 
+                               current->id, TYPE_NAME[declared_type]);
+            }
+        }
 
         current = current->next;
     }
 
-    string_list_free(current);
+    declarator_list_free(current);
 }
 
 int assigment_sentence(char* token_id, sym_value_type* entry,

@@ -48,7 +48,7 @@ extern int yydebug;
 #line 18 "src/parser/parser.y"
 
   #include "data_types.h"
-  #include "../src/semantic/string_list.h"
+  #include "../src/semantic/declarator_list.h"
 
 #line 54 "build/parser.tab.h"
 
@@ -79,7 +79,12 @@ extern int yydebug;
     TK_MOD = 273,                  /* TK_MOD  */
     TK_POW = 274,                  /* TK_POW  */
     TK_LPAREN = 275,               /* TK_LPAREN  */
-    TK_RPAREN = 276                /* TK_RPAREN  */
+    TK_RPAREN = 276,               /* TK_RPAREN  */
+    TK_LBRACKET = 277,             /* TK_LBRACKET  */
+    TK_RBRACKET = 278,             /* TK_RBRACKET  */
+    TK_REPEAT = 279,               /* TK_REPEAT  */
+    TK_DO = 280,                   /* TK_DO  */
+    TK_DONE = 281                  /* TK_DONE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -92,14 +97,14 @@ union YYSTYPE
 
     char *text;
     DATA_TYPE data_type;
-    StringListNode *id_list;
+    DeclaratorListNode *decl_list;
 
     long long int_val;
     double float_val;
 
     ExprResult expr_val;
 
-#line 103 "build/parser.tab.h"
+#line 108 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

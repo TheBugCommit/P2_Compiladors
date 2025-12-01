@@ -7,7 +7,7 @@
 #include "../src/symtab/symtab.h"
 #include "../src/utils/error.h"
 #include "../src/utils/report.h"
-#include "../src/semantic/string_list.h"
+#include "../src/semantic/declarator_list.h"
 #include "../src/semantic/handler.h"
 #include "../src/semantic/expression.h"
 
@@ -17,13 +17,13 @@ extern int yylex();
 
 %code requires {
   #include "data_types.h"
-  #include "../src/semantic/string_list.h"
+  #include "../src/semantic/declarator_list.h"
 }
 
 %union {
     char *text;
     DATA_TYPE data_type;
-    StringListNode *id_list;
+    DeclaratorListNode *decl_list;
 
     long long int_val;
     double float_val;
@@ -43,11 +43,13 @@ extern int yylex();
 /* Puntuation and Operation Tokens  */
 %token TK_ASSIGN TK_COMMA TK_NEWLINE TK_SEMICOLON TK_DOT TK_EOF
 %token TK_PLUS TK_MINUS TK_MULT TK_DIV TK_MOD TK_POW
-%token TK_LPAREN TK_RPAREN
+%token TK_LPAREN TK_RPAREN TK_LBRACKET TK_RBRACKET
+%token TK_REPEAT TK_DO TK_DONE
 
 %type <data_type> primitive_type
-%type <id_list> id_list
 %type <expr_val>  arith_expr arith_term unary_expr arith_factor primary literal
+%type <expr_val> array_decl
+%type <decl_list> declarator_list declarator
 
 %define parse.error detailed
 
@@ -89,11 +91,11 @@ opt_eof:
 
 
 simple_declaration: 
-    primitive_type id_list end_of_stmt { handle_simple_declaration($1, $2); }
-    | primitive_type id_list error
+    primitive_type declarator_list end_of_stmt { handle_simple_declaration($1, $2); }
+    | primitive_type declarator_list error
     {
         log_production("Recovered from missing \\n");
-        string_list_free($2);
+        declarator_list_free($2);
         yyerrok;
     }
     | primitive_type error end_of_stmt
@@ -103,15 +105,19 @@ simple_declaration:
     }
 ;
 
-
 primitive_type:
     TK_INT      { $$ = TYPE_INT; log_production("Type: int"); }
     | TK_FLOAT  { $$ = TYPE_FLOAT; log_production("Type: float"); }
 ;
 
-id_list:
-    TK_ID { $$ = string_list_append(NULL, $1); }
-    | id_list TK_COMMA TK_ID { $$ = string_list_append($1, $3); }
+declarator_list:
+    declarator { $$ = $1; }
+    | declarator_list TK_COMMA declarator { $$ = declarator_list_prepend($1, $3); }
+;
+
+declarator:
+    TK_ID { $$ = create_declarator($1, 0, 0); }
+    | TK_ID TK_LBRACKET TK_INT_LIT TK_RBRACKET { $$ = create_declarator($1, 1, $3); }
 ;
 
 sentence:
@@ -162,6 +168,17 @@ primary:
     TK_LPAREN arith_expr TK_RPAREN { $$ = $2; log_production("Expression: Parenthesized"); }
     | literal { $$ = $1; }
     | TK_ID { $$ = handle_primary_id($1); }
+    | TK_ID TK_LBRACKET arith_expr TK_RBRACKET 
+    {
+        log_production("Parsed Array Access: %s[...]", $1);
+        
+        /* Temporalment retornem un tipus VOID o similar perquè
+           encara no tenim la lògica semàntica feta.
+           Quan fem la semàntica, aquí calcularem l'adreça.
+        */
+        $$.type = TYPE_VOID; 
+        $$.addr = NULL;
+    }
 ;
 
 literal:

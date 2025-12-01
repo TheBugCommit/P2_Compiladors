@@ -8,19 +8,23 @@ typedef enum {
 } DATA_TYPE;
 
 typedef union {
-    long long int int_val;
-    double float_val;
+    int int_val;
+    float float_val;
 } VALUE_UNION;
 
 typedef struct {
     DATA_TYPE type;
     VALUE_UNION value;
+    char *addr;
 } ExprResult;
 
 typedef struct {
     DATA_TYPE type;
     char is_initialized;
     VALUE_UNION value;
+    int is_array;
+    int size;
+    char *addr;
 } sym_value_type;
 
 #endif
