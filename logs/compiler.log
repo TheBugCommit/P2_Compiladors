@@ -3,25 +3,18 @@
 [PROD] Multicomment skipping characters
 [PROD] Multicomment skipping characters
 [PROD] Multicomment skipping characters
-[PROD] Multiline comment closed on row: 9 col: 8
+[PROD] Multicomment skipping characters
+[PROD] Multiline comment closed on row: 15 col: 9
 [PROD] Type: int
-[PROD] Declared VAR: 'z' (Type: INT)
-[PROD] Declared VAR: 'y' (Type: INT)
 [PROD] Declared VAR: 'x' (Type: INT)
+[PROD] Type: float
+[PROD] Declared VAR: 'z' (Type: FLOAT)
+[PROD] Declared VAR: 'y' (Type: FLOAT)
+[PROD] Literal: FLOAT (3)
+[PROD] Assignment: 'y' := 3
+[PROD] Expression: Identifier 'y' -> Type: FLOAT
 [PROD] Literal: INT (3)
-[PROD] Literal: INT (3)
-[PROD] Optimization: Constant Folding ADD
-[PROD] Assignment: 'x' := 6
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Literal: INT (2)
-[PROD] Generating code for ADD
-[PROD] Assignment: 'y' := $t01
-[PROD] Expression: Identifier 'y' -> Type: INT
-[PROD] Expression: Identifier 'y' -> Type: INT
-[PROD] Literal: INT (3)
-[PROD] Generating code for MUL
-[PROD] Generating code for ADD
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Generating code for SUB
-[PROD] Assignment: 'y' := $t01
+[PROD] Generating code for POW
+[PROD] Optimization: Loop Unrolling POW (n=3)
+[PROD] Assignment: 'z' := $t01
 --- END OF ANALYSIS ---

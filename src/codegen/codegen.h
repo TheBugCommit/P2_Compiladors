@@ -8,6 +8,7 @@ void code_close();
 int gen_get_label();
 void emit_binary(const char* op, const char* dest, const char* op1,
                  const char* op2);
+void emit_goto(int label);
 void emit_unary(const char* op, const char* dest, const char* op1);
 void emit_assign(const char* dest, const char* src);
 void emit_io(const char* param, const char* prod, const int args);

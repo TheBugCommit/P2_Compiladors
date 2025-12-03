@@ -15,7 +15,7 @@ void ensure_temp_capacity(int min_size) {
     if (temp_count >= min_size) return;
 
     int old = temp_count;
-    temp_count = (temp_count == 0) ?  128 : temp_count * 2;
+    temp_count = (temp_count == 0) ?  16 : temp_count * 2;
     if (temp_count < min_size) temp_count = min_size;
 
     temp_busy = realloc(temp_busy, temp_count * sizeof(int));
@@ -67,6 +67,10 @@ void gen_release_temp(char *temp_name) {
         ensure_free_stack_capacity(free_stack_size + 1);
         free_stack[free_stack_size++] = idx;
     }
+}
+
+int is_temporary(const char* addr) {
+    return addr && strncmp(addr, "$t", 2) == 0;
 }
 
 void free_temps() {

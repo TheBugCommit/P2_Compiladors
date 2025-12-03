@@ -11,11 +11,40 @@
 #include "../utils/log.h"
 #include "globals.h"
 
+typedef enum { OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD, OP_POW } ArithOp;
+
+static double get_value(ExprResult e) {
+    return (e.type == TYPE_FLOAT) ? e.value.float_val : (double)e.value.int_val;
+}
+
+static void cleanup_operands(ExprResult a, ExprResult b) {
+    if (a.addr) free(a.addr);
+    if (b.addr) free(b.addr);
+}
+
+static ExprResult clone_result(ExprResult original) {
+    ExprResult copy = original;
+    if (original.addr) {
+        copy.addr = strdup(original.addr);
+    }
+    return copy;
+}
+
+int is_numeric(ExprResult* e) {
+    if (e->type != TYPE_INT && e->type != TYPE_FLOAT) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Type error: expected numeric type, got %s",
+                              TYPE_NAME[e->type]);
+        return 0;
+    }
+    return 1;
+}
+
 static ExprResult make_literal_result(DATA_TYPE type, double val) {
     ExprResult res;
     res.type = type;
     res.is_constant = 1;
-    res.addr = (char*)malloc(64);
+    res.addr = (char*)malloc(ADDRESS_SIZE);
 
     if (type == TYPE_INT) {
         res.value.int_val = (int)val;
@@ -27,6 +56,7 @@ static ExprResult make_literal_result(DATA_TYPE type, double val) {
     return res;
 }
 
+
 static ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
     if (expr.type == target_type) return expr;
 
@@ -35,7 +65,7 @@ static ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
             float val = (float)expr.value.int_val;
 
             if (expr.addr) free(expr.addr);
-            expr.addr = malloc(64);
+            expr.addr = malloc(ADDRESS_SIZE);
             sprintf(expr.addr, "%g", val);
 
             expr.type = TYPE_FLOAT;
@@ -58,191 +88,203 @@ static ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
     return expr;
 }
 
-int is_numeric(ExprResult* e) {
-    if (e->type != TYPE_INT && e->type != TYPE_FLOAT) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Type error: expected numeric type, got %s",
-                              TYPE_NAME[e->type]);
-        return 0;
-    }
-    return 1;
-}
-
 static ExprResult generate_arithmetic(ExprResult a, ExprResult b, char* op_int,
                                       char* op_float) {
     ExprResult res;
 
-    res.addr = gen_new_temp();
-    if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-        res.type = TYPE_FLOAT;
+    int is_float = (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT);
+    res.type = is_float ? TYPE_FLOAT : TYPE_INT;
+    char* opcode = is_float ? op_float : op_int;
 
+    if (is_float) {
         a = ensure_type(a, TYPE_FLOAT);
         b = ensure_type(b, TYPE_FLOAT);
+    }
 
-        emit_binary(op_float, res.addr, a.addr, b.addr);
+    if (is_temporary(a.addr)) {  // reuse left op
+        res.addr = a.addr;
+        emit_binary(opcode, res.addr, a.addr, b.addr);
+        gen_release_temp(b.addr);
+        if (b.addr) free(b.addr);
+    } else if (is_temporary(b.addr)) {  // reuse right op
+        res.addr = b.addr;
+        emit_binary(opcode, res.addr, a.addr, b.addr);
+        gen_release_temp(a.addr);
+        if (a.addr) free(a.addr);
     } else {
-        res.type = TYPE_INT;
-        emit_binary(op_int, res.addr, a.addr, b.addr);
+        res.addr = gen_new_temp();
+        emit_binary(opcode, res.addr, a.addr, b.addr);
+        gen_release_temp(a.addr);
+        gen_release_temp(b.addr);
+        cleanup_operands(a, b);
     }
 
     res.is_constant = 0;
 
-    gen_release_temp(a.addr);
-    gen_release_temp(b.addr);
-    if (a.addr) free(a.addr);
-    if (b.addr) free(b.addr);
-
     return res;
 }
 
-ExprResult eval_add(ExprResult a, ExprResult b) {
+static ExprResult generate_pow_code(ExprResult a, ExprResult b) {
     ExprResult res = {TYPE_VOID};
-    if (!is_numeric(&a) || !is_numeric(&b)) return res;
 
-    if (a.is_constant && b.is_constant) {
-        log_production("Optimization: Constant Folding ADD");
-        if (a.addr) free(a.addr);
-        if (b.addr) free(b.addr);
+    if (b.is_constant && b.value.int_val >= 0 && b.value.int_val <= 4) {
+        int n = b.value.int_val;
+        log_production("Optimization: Loop Unrolling POW (n=%d)", n);
 
-        if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-            float val_a = (a.type == TYPE_FLOAT) ? a.value.float_val
-                                                 : (float)a.value.int_val;
-            float val_b = (b.type == TYPE_FLOAT) ? b.value.float_val
-                                                 : (float)b.value.int_val;
-            return make_literal_result(TYPE_FLOAT, val_a + val_b);
-        } else {
-            return make_literal_result(
-                TYPE_INT, (double)(a.value.int_val + b.value.int_val));
+        if (n == 0) {
+            cleanup_operands(a, b);
+            DATA_TYPE t = (a.type == TYPE_FLOAT) ? TYPE_FLOAT : TYPE_INT;
+            return make_literal_result(t, 1);
         }
-    }
-
-    log_production("Generating code for ADD");
-    return generate_arithmetic(a, b, "ADDI", "ADDF");
-}
-
-ExprResult eval_sub(ExprResult a, ExprResult b) {
-    ExprResult res = {TYPE_VOID};
-    if (!is_numeric(&a) || !is_numeric(&b)) return res;
-
-    if (a.is_constant && b.is_constant) {
-        log_production("Optimization: Constant Folding SUB");
-        if (a.addr) free(a.addr);
-        if (b.addr) free(b.addr);
-
-        if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-            float val_a = (a.type == TYPE_FLOAT) ? a.value.float_val
-                                                 : (float)a.value.int_val;
-            float val_b = (b.type == TYPE_FLOAT) ? b.value.float_val
-                                                 : (float)b.value.int_val;
-            return make_literal_result(TYPE_FLOAT, val_a - val_b);
-        } else {
-            return make_literal_result(
-                TYPE_INT, (double)(a.value.int_val - b.value.int_val));
-        }
-    }
-
-    log_production("Generating code for SUB");
-    return generate_arithmetic(a, b, "SUBI", "SUBF");
-}
-
-ExprResult eval_mul(ExprResult a, ExprResult b) {
-    ExprResult res = {TYPE_VOID};
-    if (!is_numeric(&a) || !is_numeric(&b)) return res;
-
-    if (a.is_constant && b.is_constant) {
-        log_production("Optimization: Constant Folding MUL");
-        if (a.addr) free(a.addr);
-        if (b.addr) free(b.addr);
-
-        if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-            float val_a = (a.type == TYPE_FLOAT) ? a.value.float_val
-                                                 : (float)a.value.int_val;
-            float val_b = (b.type == TYPE_FLOAT) ? b.value.float_val
-                                                 : (float)b.value.int_val;
-            return make_literal_result(TYPE_FLOAT, val_a * val_b);
-        } else {
-            return make_literal_result(
-                TYPE_INT, (double)(a.value.int_val * b.value.int_val));
-        }
-    }
-
-    log_production("Generating code for MUL");
-    return generate_arithmetic(a, b, "MULI", "MULF");
-}
-
-ExprResult eval_div(ExprResult a, ExprResult b) {
-    ExprResult res = {TYPE_VOID};
-    if (!is_numeric(&a) || !is_numeric(&b)) return res;
-
-    if (b.is_constant) {
-        float val_b =
-            (b.type == TYPE_FLOAT) ? b.value.float_val : (float)b.value.int_val;
-        if (val_b == 0) {
-            REPORT_SEMANTIC_ERROR(current_location(),
-                                  "Division by zero detected");
-            if (a.addr) free(a.addr);
+        if (n == 1) {
             if (b.addr) free(b.addr);
-            return res;
+            return a;
         }
-    }
 
-    if (a.is_constant && b.is_constant) {
-        log_production("Optimization: Constant Folding DIV");
-        if (a.addr) free(a.addr);
-        if (b.addr) free(b.addr);
+        res = clone_result(a); 
+        char* op_int = "MULI"; char* op_float = "MULF";
 
-        if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-            float val_a = (a.type == TYPE_FLOAT) ? a.value.float_val
-                                                 : (float)a.value.int_val;
-            float val_b = (b.type == TYPE_FLOAT) ? b.value.float_val
-                                                 : (float)b.value.int_val;
-            return make_literal_result(TYPE_FLOAT, val_a / val_b);
-        } else {
-            return make_literal_result(
-                TYPE_INT, (double)(a.value.int_val / b.value.int_val));
+        for (int i = 1; i < n; i++) {
+            ExprResult next_a = clone_result(a);
+            res = generate_arithmetic(res, next_a, op_int, op_float);
         }
-    }
-
-    log_production("Generating code for DIV");
-    return generate_arithmetic(a, b, "DIVI", "DIVF");
-}
-
-// TODO: MOD with float operands
-ExprResult eval_mod(ExprResult a, ExprResult b) {
-    ExprResult res = {TYPE_VOID};
-    if (!is_numeric(&a) || !is_numeric(&b)) return res;
-
-    if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Modulo (%) invalid for FLOAT operands");
+        
+        cleanup_operands(a, b);
         return res;
     }
 
-    if (a.is_constant && b.is_constant) {
-        log_production("Optimization: Constant Folding MOD");
-        if (a.addr) free(a.addr);
-        if (b.addr) free(b.addr);
+    log_production("Generating runtime loop for POW");
+    
+    char* t_res = gen_new_temp();
+    char* t_cnt = gen_new_temp();
 
-        if (b.value.int_val == 0) {
-            REPORT_SEMANTIC_ERROR(current_location(), "Modulo by zero");
-            return res;
-        }
+    if (a.type == TYPE_FLOAT) { emit_assign(t_res, "1.0"); res.type = TYPE_FLOAT; }
+    else { emit_assign(t_res, "1"); res.type = TYPE_INT; }
+    
+    emit_assign(t_cnt, "0");
 
-        return make_literal_result(TYPE_INT,
-                                   (double)(a.value.int_val % b.value.int_val));
+    int start_label = gen_get_label(); 
+
+    emit_if_goto("GEI", t_cnt, b.addr, start_label + 4);
+
+    char* op_mul = (res.type == TYPE_FLOAT) ? "MULF" : "MULI";
+    emit_binary(op_mul, t_res, t_res, a.addr);
+    emit_binary("ADDI", t_cnt, t_cnt, "1");
+    emit_goto(start_label);
+    cleanup_operands(a, b);
+    gen_release_temp(t_cnt); 
+    if(t_cnt) free(t_cnt);
+
+    res.is_constant = 0;
+    res.addr = t_res;
+    return res;
+}
+
+static ExprResult eval_arithmetic_common(ExprResult a, ExprResult b, ArithOp op,
+                                         char* name, char* op_int,
+                                         char* op_float) {
+    ExprResult res = {TYPE_VOID};
+
+    if (!is_numeric(&a) || !is_numeric(&b)) return res;
+
+    if (op == OP_POW && (b.type == TYPE_FLOAT)) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Pow invalid FLOAT exponent");
+        cleanup_operands(a, b);
+        return res;
     }
 
-    res.type = TYPE_INT;
-    res.addr = gen_new_temp();
-    res.is_constant = 0;
+    if (op == OP_MOD && (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT)) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Modulo (%) invalid for FLOAT operands");
+        cleanup_operands(a, b);
+        return res;
+    }
 
-    emit_binary("MODI", res.addr, a.addr, b.addr);
+    if ((op == OP_DIV || op == OP_MOD) && b.is_constant) {
+        double val_b = get_value(b);
+        if (val_b == 0) {
+            REPORT_SEMANTIC_ERROR(current_location(), "%s by zero detected",
+                                  name);
+            cleanup_operands(a, b);
+            return res;
+        }
+    }
 
-    gen_release_temp(a.addr);
-    gen_release_temp(b.addr);
-    if (a.addr) free(a.addr);
-    if (b.addr) free(b.addr);
-    return res;
+    if (a.is_constant && b.is_constant) {
+        log_production("Optimization: Constant Folding %s", name);
+
+        cleanup_operands(a, b);
+
+        double val_a = get_value(a);
+        double val_b = get_value(b);
+        double result_val = 0;
+
+        switch (op) {
+            case OP_ADD:
+                result_val = val_a + val_b;
+                break;
+            case OP_SUB:
+                result_val = val_a - val_b;
+                break;
+            case OP_MUL:
+                result_val = val_a * val_b;
+                break;
+            case OP_DIV:
+                result_val = val_a / val_b;
+                break;
+            case OP_MOD:
+                result_val = (int)val_a % (int)val_b;
+                break;
+            case OP_POW: 
+                result_val = pow(val_a, val_b); 
+                break;
+        }
+
+        DATA_TYPE res_type = TYPE_INT;
+        if (op != OP_MOD) {
+            if (a.type == TYPE_FLOAT || b.type == TYPE_FLOAT) {
+                res_type = TYPE_FLOAT;
+            } else if (op == OP_POW && val_b < 0) {
+                res_type = TYPE_FLOAT;
+            }
+        }
+
+        return make_literal_result(res_type, result_val);
+    }
+
+    log_production("Generating code for %s", name);
+
+    if (op == OP_POW) {
+        return generate_pow_code(a, b);
+    } else {
+        return generate_arithmetic(a, b, op_int, op_float);
+    }
+}
+
+ExprResult eval_add(ExprResult a, ExprResult b) {
+    return eval_arithmetic_common(a, b, OP_ADD, "ADD", "ADDI", "ADDF");
+}
+
+ExprResult eval_sub(ExprResult a, ExprResult b) {
+    return eval_arithmetic_common(a, b, OP_SUB, "SUB", "SUBI", "SUBF");
+}
+
+ExprResult eval_mul(ExprResult a, ExprResult b) {
+    return eval_arithmetic_common(a, b, OP_MUL, "MUL", "MULI", "MULF");
+}
+
+ExprResult eval_div(ExprResult a, ExprResult b) {
+    return eval_arithmetic_common(a, b, OP_DIV, "DIV", "DIVI", "DIVF");
+}
+
+ExprResult eval_mod(ExprResult a, ExprResult b) {
+    // MODI no té versió float, passem NULL o "" com a op_float
+    return eval_arithmetic_common(a, b, OP_MOD, "MOD", "MODI", "");
+}
+
+ExprResult eval_pow(ExprResult a, ExprResult b) {
+    return eval_arithmetic_common(a, b, OP_POW, "POW", "", "");
 }
 
 ExprResult eval_unary_minus(ExprResult a) {
@@ -251,6 +293,7 @@ ExprResult eval_unary_minus(ExprResult a) {
         if (a.addr) free(a.addr);
         return res;
     }
+
     if (a.is_constant) {
         log_production("Optimization: Constant Folding Unary Minus");
         if (a.addr) free(a.addr);
@@ -263,95 +306,18 @@ ExprResult eval_unary_minus(ExprResult a) {
 
     res.type = a.type;
     res.is_constant = 0;
-    res.addr = gen_new_temp();
-
     char* op_code = (a.type == TYPE_FLOAT) ? "CHSF" : "CHSI";
-    emit_unary(op_code, res.addr, a.addr);
 
-    gen_release_temp(a.addr);
-    if(a.addr) free(a.addr);
-    return res;
-}
-
-ExprResult eval_unary_plus(ExprResult a) {
-    return a;
-}
-
-//TODO: revisar i comporvar leaks de memoria
-ExprResult eval_pow(ExprResult a, ExprResult b) {
-    ExprResult res;
-    if (!is_numeric(&a) || !is_numeric(&b)) {
-        res.type = TYPE_VOID;
-        return res;
-    }
-
-    // 1. Constant Folding
-    if (a.is_constant && b.is_constant) {
-        double base =
-            (a.type == TYPE_FLOAT) ? a.value.float_val : a.value.int_val;
-        double exp =
-            (b.type == TYPE_FLOAT) ? b.value.float_val : b.value.int_val;
-        double r = pow(base, exp);
-        return make_literal_result(
-            (a.type == TYPE_FLOAT) ? TYPE_FLOAT : TYPE_INT, r);
-    }
-
-    // 2. Generació: Exponent ha de ser enter per fer bucle simple
-    if (b.type != TYPE_INT) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Exponent must be INT for code generation");
-        res.type = TYPE_VOID;
-        return res;
-    }
-
-    // Temporals pel bucle
-    char* t_res = gen_new_temp();  // Acumulador result
-    char* t_cnt = gen_new_temp();  // Comptador
-
-    // Inicialització: res := 1
-    if (a.type == TYPE_FLOAT) {
-        emit_assign(t_res, "1.0");
-        res.type = TYPE_FLOAT;
+    if (is_temporary(a.addr)) {
+        res.addr = a.addr;
+        emit_unary(op_code, res.addr, res.addr);
     } else {
-        emit_assign(t_res, "1");
-        res.type = TYPE_INT;
+        res.addr = gen_new_temp();
+        emit_unary(op_code, res.addr, a.addr);
+        if (a.addr) free(a.addr);
     }
-    // Inicialització: cnt := 0
-    emit_assign(t_cnt, "0");
 
-    /*
-     * LÒGICA DEL BUCLE AMB NUMEROS DE LÍNIA (OFFSET)
-     * Volem fer: while(cnt < b) { res = res * a; cnt++ }
-     * * Línia N   : IF cnt GEI b GOTO (N + 4)  <-- Condició sortida
-     * Línia N+1 : res := res MUL a           <-- Cos
-     * Línia N+2 : cnt := cnt ADDI 1          <-- Cos
-     * Línia N+3 : GOTO N                     <-- Tornar inici
-     * Línia N+4 : (Continuació del programa)
-     */
-
-    int start_label = gen_get_label();  // Obtenim la línia actual (N)
-
-    // Salt de sortida: Si cnt >= exponent, saltem 4 instruccions endavant
-    // El destí serà start_label + 4
-    emit_if_goto("GEI", t_cnt, b.addr, start_label + 4);
-
-    // Cos: Multiplicar
-    //    char op_mul[10] = res.type == TYPE_FLOAT ? "MULF" : "MULI";
-    //   emit_binary(op_mul, t_res, t_res, a.addr);
-
-    // Cos: Increment
-    emit_binary("ADDI", t_cnt, t_cnt, "1");
-
-    // Tornar a inici
-    // emit_goto(start_label); // [cite: 196] Salt incondicional a número de
-    // línia
-
-    // Alliberem
-    gen_release_temp(a.addr);
-    gen_release_temp(b.addr);
-    gen_release_temp(t_cnt);  // El comptador ja no el volem
-
-    res.is_constant = 0;
-    res.addr = t_res;
     return res;
 }
+
+ExprResult eval_unary_plus(ExprResult a) { return a; }

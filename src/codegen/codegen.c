@@ -53,6 +53,10 @@ void emit_if_goto(const char* op, const char* op1, const char* op2, int label) {
     emit("IF %s %s %s GOTO %d", op1, op, op2, label);
 }
 
+void emit_goto(int label) {
+    emit("GOTO %d", label);
+}
+
 void emit_unary(const char* op, const char* dest, const char* op1) {
     emit("%s := %s %s", dest, op, op1);
 }

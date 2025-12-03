@@ -156,7 +156,7 @@ ExprResult handle_primary_id(char* token_id) {
             expr.addr = strdup(entry->addr);
 
             /* TODO: Constant propagation (vigilar amb repeat)
-            expr.addr = malloc(64);
+            expr.addr = malloc(ADDRESS_SIZE);
             if (entry->type == TYPE_INT)
                 sprintf(expr.addr, "%d", entry->value.int_val);
             else

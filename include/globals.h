@@ -3,6 +3,8 @@
 
 #include "data_types.h"
 
+#define ADDRESS_SIZE 64
+
 extern const char* TYPE_NAME[];
 
 typedef struct {
