@@ -49,7 +49,7 @@ char* gen_new_temp() {
     temp_busy[idx] = 1;
 
 
-    char *buffer = malloc(8);
+    char *buffer = malloc(16);
     sprintf(buffer, "$t%02d", idx + 1);
 
     return buffer;

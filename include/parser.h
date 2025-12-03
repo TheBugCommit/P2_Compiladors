@@ -99,8 +99,8 @@ union YYSTYPE
     DATA_TYPE data_type;
     DeclaratorListNode *decl_list;
 
-    long long int_val;
-    double float_val;
+    int int_val;
+    float float_val;
 
     ExprResult expr_val;
 

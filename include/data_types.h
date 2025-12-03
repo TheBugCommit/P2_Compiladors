@@ -16,6 +16,9 @@ typedef struct {
     DATA_TYPE type;
     VALUE_UNION value;
     char *addr;
+    int is_literal;
+    int is_array;
+    int size;
 } ExprResult;
 
 typedef struct {

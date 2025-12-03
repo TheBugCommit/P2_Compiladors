@@ -25,8 +25,8 @@ extern int yylex();
     DATA_TYPE data_type;
     DeclaratorListNode *decl_list;
 
-    long long int_val;
-    double float_val;
+    int int_val;
+    float float_val;
 
     ExprResult expr_val;
 }
@@ -48,8 +48,8 @@ extern int yylex();
 
 %type <data_type> primitive_type
 %type <expr_val>  arith_expr arith_term unary_expr arith_factor primary literal
-%type <expr_val> array_decl
 %type <decl_list> declarator_list declarator
+//%type <int_val> repeat_sentence
 
 %define parse.error detailed
 
@@ -123,7 +123,28 @@ declarator:
 sentence:
     assignment_sentence end_of_stmt
     | expression_sentence end_of_stmt
+    //| repeat_sentence
 ;
+
+/*
+TODO: Com es faria per permetre declaracions de variables dins dun bucle, sense que peti 
+repeat_sentence:
+    TK_REPEAT arith_expr 
+    {
+        $<int_val>$ = gen_get_label(); 
+    }
+    TK_DO  item_list TK_DONE
+    {
+        int start_label = $3; // L'etiqueta que hem guardat a la posició 3
+        char *counter = $2.addr;       // La variable on tenim el número de repeticions
+
+        emit_binary("SUBI", counter, counter, "1");
+
+        emit_if_goto("GEI", counter, "1", start_label);
+        
+        log_production("Repeat loop generated (Start label: %d)", start_label);
+    }
+;*/
 
 assignment_sentence:
     TK_ID TK_ASSIGN arith_expr { handle_assigment_sentence($1, $3); }
@@ -171,11 +192,6 @@ primary:
     | TK_ID TK_LBRACKET arith_expr TK_RBRACKET 
     {
         log_production("Parsed Array Access: %s[...]", $1);
-        
-        /* Temporalment retornem un tipus VOID o similar perquè
-           encara no tenim la lògica semàntica feta.
-           Quan fem la semàntica, aquí calcularem l'adreça.
-        */
         $$.type = TYPE_VOID; 
         $$.addr = NULL;
     }
@@ -186,12 +202,18 @@ literal:
     {
         $$.type = TYPE_INT;
         $$.value.int_val = $1;
-        log_production("Literal: %s (%lld)", TYPE_NAME[$$.type], $1);
+        $$.is_literal = 1;
+        $$.addr = malloc(64);
+        sprintf($$.addr, "%d", $1);
+        log_production("Literal: %s (%d)", TYPE_NAME[$$.type], $1);
     }
     | TK_FLOAT_LIT
     {
         $$.type = TYPE_FLOAT;
         $$.value.float_val = $1;
+        $$.is_literal = 1;
+        $$.addr = malloc(64);
+        sprintf($$.addr, "%g", $1);
         log_production("Literal: %s (%g)", TYPE_NAME[$$.type], $1);
     }
 %%

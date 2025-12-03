@@ -104,7 +104,7 @@ INT             {DIGIT}+
 {FLOAT}     { 
     errno = 0;
     char *endptr;
-    double val = strtod(yytext, &endptr);
+    float val = strtof(yytext, &endptr);
 
     if (endptr == yytext) {
         REPORT_LEXICAL_ERROR(current_location(), "Invalid float literal: %s", yytext);
