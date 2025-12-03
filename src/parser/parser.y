@@ -202,7 +202,7 @@ literal:
     {
         $$.type = TYPE_INT;
         $$.value.int_val = $1;
-        $$.is_literal = 1;
+        $$.is_constant = 1;
         $$.addr = malloc(64);
         sprintf($$.addr, "%d", $1);
         log_production("Literal: %s (%d)", TYPE_NAME[$$.type], $1);
@@ -211,7 +211,7 @@ literal:
     {
         $$.type = TYPE_FLOAT;
         $$.value.float_val = $1;
-        $$.is_literal = 1;
+        $$.is_constant = 1;
         $$.addr = malloc(64);
         sprintf($$.addr, "%g", $1);
         log_production("Literal: %s (%g)", TYPE_NAME[$$.type], $1);

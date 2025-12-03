@@ -13,7 +13,7 @@
 #include "expression.h"
 #include "globals.h"
 
-static char* ensure_assignment_type(DATA_TYPE var_type, ExprResult* expr) {  
+static char* ensure_assignment_type(DATA_TYPE var_type, ExprResult* expr) {
     if (var_type == expr->type) return expr->addr;
 
     if (var_type == TYPE_FLOAT && expr->type == TYPE_INT) {
@@ -22,11 +22,11 @@ static char* ensure_assignment_type(DATA_TYPE var_type, ExprResult* expr) {
         emit_unary("I2F", t_conv, expr->addr);
 
         gen_release_temp(expr->addr);
-        if(expr->addr) free(expr->addr);
+        if (expr->addr) free(expr->addr);
 
         return t_conv;
     }
-    
+
     if (var_type == TYPE_INT && expr->type == TYPE_FLOAT) {
         REPORT_SEMANTIC_ERROR(current_location(),
                               "Warning: Assigning FLOAT to INT variable "
@@ -35,7 +35,6 @@ static char* ensure_assignment_type(DATA_TYPE var_type, ExprResult* expr) {
 
     return expr->addr;
 }
-
 
 void handle_simple_declaration(DATA_TYPE declared_type,
                                DeclaratorListNode* list) {
@@ -101,10 +100,29 @@ void handle_assigment_sentence(char* token_id, ExprResult expression) {
 
     log_production("Assignment: '%s' := %s", token_id, final_addr);
 
-    if (entry->is_initialized == 0) {
-        entry->is_initialized = 1;
-        sym_enter(token_id, entry);
-    }
+    entry->is_initialized = 1;
+
+   /* TODO: Constant propagation (vigilar amb repeat) 
+   if (expression.is_constant) {
+        entry->is_constant = 1;
+
+        if (entry->type == TYPE_INT) {
+            entry->value.int_val = (expression.type == TYPE_FLOAT)
+                                       ? (int)expression.value.float_val
+                                       : expression.value.int_val;
+        } else {
+            entry->value.float_val = (expression.type == TYPE_INT)
+                                         ? (float)expression.value.int_val
+                                         : expression.value.float_val;
+        }
+        log_production("Constant Propagation: Variable '%s' is now constant %s",
+                       token_id, expression.addr);
+    } else {
+        entry->is_constant = 0;
+    }*/
+    
+    entry->is_constant = 0;
+    sym_enter(token_id, entry);
 
     gen_release_temp(final_addr);
     if (final_addr) free(final_addr);
@@ -130,16 +148,32 @@ ExprResult handle_primary_id(char* token_id) {
     } else {
         expr.type = entry->type;
         expr.value = entry->value;
-        expr.is_literal = 0;
         expr.is_array = entry->is_array;
         expr.size = entry->size;
-        expr.addr = strdup(entry->addr);
+        expr.is_constant = entry->is_constant;
 
-        log_production("Expression: Identifier '%s' -> Type: %s", token_id, TYPE_NAME[expr.type]);
+        if (entry->is_constant) {
+            expr.addr = strdup(entry->addr);
+
+            /* TODO: Constant propagation (vigilar amb repeat)
+            expr.addr = malloc(64);
+            if (entry->type == TYPE_INT)
+                sprintf(expr.addr, "%d", entry->value.int_val);
+            else
+                sprintf(expr.addr, "%g", entry->value.float_val);
+
+            log_production("Constant Propagation: Using value '%s' for id '%s'",
+                           expr.addr, token_id);*/
+        } else {
+            expr.addr = strdup(entry->addr);
+        }
+
+        log_production("Expression: Identifier '%s' -> Type: %s", token_id,
+                       TYPE_NAME[expr.type]);
     }
 
     free(token_id);
     free(entry);
-    
+
     return expr;
 }

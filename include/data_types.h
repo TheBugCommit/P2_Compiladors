@@ -16,7 +16,7 @@ typedef struct {
     DATA_TYPE type;
     VALUE_UNION value;
     char *addr;
-    int is_literal;
+    int is_constant;
     int is_array;
     int size;
 } ExprResult;
@@ -26,6 +26,7 @@ typedef struct {
     char is_initialized;
     VALUE_UNION value;
     int is_array;
+    int is_constant;
     int size;
     char *addr;
 } sym_value_type;

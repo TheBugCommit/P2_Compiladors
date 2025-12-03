@@ -14,7 +14,7 @@
 static ExprResult make_literal_result(DATA_TYPE type, double val) {
     ExprResult res;
     res.type = type;
-    res.is_literal = 1;
+    res.is_constant = 1;
     res.addr = (char*)malloc(64);
 
     if (type == TYPE_INT) {
@@ -31,7 +31,7 @@ static ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
     if (expr.type == target_type) return expr;
 
     if (expr.type == TYPE_INT && target_type == TYPE_FLOAT) {
-        if (expr.is_literal) {
+        if (expr.is_constant) {
             float val = (float)expr.value.int_val;
 
             if (expr.addr) free(expr.addr);
@@ -51,7 +51,7 @@ static ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
 
         expr.addr = t_conv;
         expr.type = TYPE_FLOAT;
-        expr.is_literal = 0;
+        expr.is_constant = 0;
         return expr;
     }
 
@@ -85,7 +85,7 @@ static ExprResult generate_arithmetic(ExprResult a, ExprResult b, char* op_int,
         emit_binary(op_int, res.addr, a.addr, b.addr);
     }
 
-    res.is_literal = 0;
+    res.is_constant = 0;
 
     gen_release_temp(a.addr);
     gen_release_temp(b.addr);
@@ -99,7 +99,7 @@ ExprResult eval_add(ExprResult a, ExprResult b) {
     ExprResult res = {TYPE_VOID};
     if (!is_numeric(&a) || !is_numeric(&b)) return res;
 
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         log_production("Optimization: Constant Folding ADD");
         if (a.addr) free(a.addr);
         if (b.addr) free(b.addr);
@@ -124,7 +124,7 @@ ExprResult eval_sub(ExprResult a, ExprResult b) {
     ExprResult res = {TYPE_VOID};
     if (!is_numeric(&a) || !is_numeric(&b)) return res;
 
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         log_production("Optimization: Constant Folding SUB");
         if (a.addr) free(a.addr);
         if (b.addr) free(b.addr);
@@ -149,7 +149,7 @@ ExprResult eval_mul(ExprResult a, ExprResult b) {
     ExprResult res = {TYPE_VOID};
     if (!is_numeric(&a) || !is_numeric(&b)) return res;
 
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         log_production("Optimization: Constant Folding MUL");
         if (a.addr) free(a.addr);
         if (b.addr) free(b.addr);
@@ -174,7 +174,7 @@ ExprResult eval_div(ExprResult a, ExprResult b) {
     ExprResult res = {TYPE_VOID};
     if (!is_numeric(&a) || !is_numeric(&b)) return res;
 
-    if (b.is_literal) {
+    if (b.is_constant) {
         float val_b =
             (b.type == TYPE_FLOAT) ? b.value.float_val : (float)b.value.int_val;
         if (val_b == 0) {
@@ -186,7 +186,7 @@ ExprResult eval_div(ExprResult a, ExprResult b) {
         }
     }
 
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         log_production("Optimization: Constant Folding DIV");
         if (a.addr) free(a.addr);
         if (b.addr) free(b.addr);
@@ -218,7 +218,7 @@ ExprResult eval_mod(ExprResult a, ExprResult b) {
         return res;
     }
 
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         log_production("Optimization: Constant Folding MOD");
         if (a.addr) free(a.addr);
         if (b.addr) free(b.addr);
@@ -234,7 +234,7 @@ ExprResult eval_mod(ExprResult a, ExprResult b) {
 
     res.type = TYPE_INT;
     res.addr = gen_new_temp();
-    res.is_literal = 0;
+    res.is_constant = 0;
 
     emit_binary("MODI", res.addr, a.addr, b.addr);
 
@@ -251,7 +251,7 @@ ExprResult eval_unary_minus(ExprResult a) {
         if (a.addr) free(a.addr);
         return res;
     }
-    if (a.is_literal) {
+    if (a.is_constant) {
         log_production("Optimization: Constant Folding Unary Minus");
         if (a.addr) free(a.addr);
 
@@ -262,7 +262,7 @@ ExprResult eval_unary_minus(ExprResult a) {
     }
 
     res.type = a.type;
-    res.is_literal = 0;
+    res.is_constant = 0;
     res.addr = gen_new_temp();
 
     char* op_code = (a.type == TYPE_FLOAT) ? "CHSF" : "CHSI";
@@ -286,7 +286,7 @@ ExprResult eval_pow(ExprResult a, ExprResult b) {
     }
 
     // 1. Constant Folding
-    if (a.is_literal && b.is_literal) {
+    if (a.is_constant && b.is_constant) {
         double base =
             (a.type == TYPE_FLOAT) ? a.value.float_val : a.value.int_val;
         double exp =
@@ -351,7 +351,7 @@ ExprResult eval_pow(ExprResult a, ExprResult b) {
     gen_release_temp(b.addr);
     gen_release_temp(t_cnt);  // El comptador ja no el volem
 
-    res.is_literal = 0;
+    res.is_constant = 0;
     res.addr = t_res;
     return res;
 }
