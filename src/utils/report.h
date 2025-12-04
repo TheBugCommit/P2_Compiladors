@@ -1,7 +1,6 @@
 #ifndef REPORT_H
 #define REPORT_H
 
-#include "../semantic/expression.h"
 #include "data_types.h"
 #include "globals.h"
 

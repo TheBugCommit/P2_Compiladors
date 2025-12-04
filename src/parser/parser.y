@@ -9,7 +9,7 @@
 #include "../src/utils/report.h"
 #include "../src/semantic/declarator_list.h"
 #include "../src/semantic/handler.h"
-#include "../src/semantic/expression.h"
+#include "../src/semantic/expression/expression.h"
 
 extern int yylex();
 

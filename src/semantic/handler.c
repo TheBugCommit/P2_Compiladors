@@ -10,7 +10,6 @@
 #include "../utils/error.h"
 #include "../utils/log.h"
 #include "../utils/report.h"
-#include "expression.h"
 #include "globals.h"
 
 static char* ensure_assignment_type(DATA_TYPE var_type, ExprResult* expr) {
