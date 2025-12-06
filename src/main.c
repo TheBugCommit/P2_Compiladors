@@ -15,25 +15,24 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    error_init();
-    log_init(argv[2]);
-    code_init(stdout);
-
     FILE* input_file = fopen(argv[1], "r");
     if (!input_file) {
         SourceLocation loc = {0, 0, argv[1]};
         REPORT_LEXICAL_ERROR(loc, "Can't open file '%s'", argv[1]);
-        log_close();
-        code_close();
         return EXIT_FAILURE;
     }
+
+    error_init();
+    log_init(argv[2]);
+    code_init(stdout);
 
     yyin = input_file;
     printf("=== COMPILING ===\n");
 
     int parse_result = yyparse();
+    emit_halt();
+    print_quads();
     if (parse_result == 0 && !has_errors()) {
-        emit_halt();
         printf("=== COMPILATION COMPLETE ===\n");
     } else {
         printf("=== COMPILATION FAILED ===\n");
