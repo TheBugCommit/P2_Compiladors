@@ -1,8 +1,8 @@
-#ifndef HANDLER_H
-#define HANDLER_H
+#ifndef HANDLERS_H
+#define HANDLERS_H
 
 #include "data_types.h"
-#include "./declarator_list.h"
+#include "../declarator_list.h"
 
 void handle_simple_declaration(DATA_TYPE declared_type, DeclaratorListNode *list);
 void handle_assigment_sentence(char * token_id, ExprResult expression);

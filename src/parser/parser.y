@@ -8,7 +8,7 @@
 #include "../src/utils/error.h"
 #include "../src/utils/report.h"
 #include "../src/semantic/declarator_list.h"
-#include "../src/semantic/handler.h"
+#include "../src/semantic/handlers/handlers.h"
 #include "../src/semantic/expression/expression.h"
 
 extern int yylex();
