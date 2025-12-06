@@ -3,16 +3,9 @@
 
 #include "data_types.h"
 #include "expression.h"
+#include "expression_utils.h"
 
 typedef enum { OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD, OP_POW } ArithOp;
-
-double get_value(ExprResult e);
-void cleanup_operands(ExprResult a, ExprResult b);
-ExprResult clone_result(ExprResult original);
-int is_temporary(const char* addr);
-int is_numeric(ExprResult* e);
-ExprResult make_literal_result(DATA_TYPE type, double val);
-ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type);
 
 int check_arithmetic_validity(ExprResult* a, ExprResult* b, ArithOp op);
 

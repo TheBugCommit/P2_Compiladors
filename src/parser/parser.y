@@ -148,6 +148,7 @@ repeat_sentence:
 
 assignment_sentence:
     TK_ID TK_ASSIGN arith_expr { handle_assigment_sentence($1, $3); }
+    | TK_ID TK_LBRACKET arith_expr TK_RBRACKET TK_ASSIGN arith_expr { handle_array_assignment($1, $3, $6); }
 ;
 
 expression_sentence:
@@ -192,8 +193,7 @@ primary:
     | TK_ID TK_LBRACKET arith_expr TK_RBRACKET 
     {
         log_production("Parsed Array Access: %s[...]", $1);
-        $$.type = TYPE_VOID; 
-        $$.addr = NULL;
+        $$ = handle_array_access($1, $3);
     }
 ;
 

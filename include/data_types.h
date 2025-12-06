@@ -28,6 +28,7 @@ typedef struct {
     int is_array;
     int is_constant;
     int size;
+    int base_addr;
     char *addr;
 } sym_value_type;
 

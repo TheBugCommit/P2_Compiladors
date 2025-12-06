@@ -6,6 +6,7 @@
 #include "../../codegen/gen_temps.h"
 #include "../../utils/error.h"
 #include "../../utils/log.h"
+#include "expression_utils.h"
 #include "expression_priv.h"
 #include "globals.h"
 

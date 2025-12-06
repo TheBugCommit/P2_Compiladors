@@ -64,3 +64,7 @@ void emit_unary(const char* op, const char* dest, const char* op1) {
 void emit_array_store(const char* array_name, const char* offset, const char* value) {
     emit("%s[%s] := %s", array_name, offset, value);
 }
+
+void emit_array_load(const char* dest, const char* array_name, const char* offset) {
+    emit("%s := %s[%s]", dest, array_name, offset);
+}

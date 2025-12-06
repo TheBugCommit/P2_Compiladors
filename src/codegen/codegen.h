@@ -14,6 +14,7 @@ void emit_assign(const char* dest, const char* src);
 void emit_io(const char* param, const char* prod, const int args);
 void emit_if_goto(const char* op, const char* op1, const char* op2, int label);
 void emit_array_store(const char* array_name, const char* offset, const char* value);
+void emit_array_load(const char* dest, const char* array_name, const char* offset);
 void emit_halt();
 
 #endif
