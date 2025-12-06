@@ -1,21 +1,45 @@
 --- START OF ANALYSIS ---
-[PROD] Multiline comment start on row: 1 col: 0
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multiline comment closed on row: 15 col: 9
 [PROD] Type: int
-[PROD] Declared VAR: 'x' (Type: INT)
+[PROD] Declared ARRAY: 'c' [30] (Type: INT)
+[PROD] Declared VAR: 'b' (Type: INT)
+[PROD] Declared ARRAY: 'a' [20] (Type: INT)
 [PROD] Type: float
-[PROD] Declared VAR: 'z' (Type: FLOAT)
-[PROD] Declared VAR: 'y' (Type: FLOAT)
-[PROD] Literal: INT (3)
-[PROD] Assignment: 'x' := 3
-[PROD] Literal: FLOAT (3)
-[PROD] Assignment: 'y' := 3
-[PROD] Expression: Identifier 'y' -> Type: FLOAT
-[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] Declared ARRAY: 'f' [30] (Type: FLOAT)
+[PROD] Declared VAR: 'e' (Type: FLOAT)
+[PROD] Declared ARRAY: 'd' [20] (Type: FLOAT)
+[PROD] Multiline comment start on row: 3 col: 0
+[PROD] Multicomment skipping characters
+[PROD] Multicomment skipping characters
+[PROD] Multiline comment closed on row: 11 col: 18
+[PROD] Literal: INT (2)
+[PROD] Assignment: 'b' := 2
+[PROD] Literal: INT (0)
+[PROD] Literal: INT (1)
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Array Store: a[...]
+[PROD] Literal: INT (1)
+[PROD] Literal: INT (1)
+[PROD] Literal: INT (5)
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Array Store: c[...]
+[PROD] Literal: INT (2)
+[PROD] Expression: Identifier 'b' -> Type: INT
+[PROD] Literal: INT (0)
+[PROD] Parsed Array Access: a[...]
+[PROD] Array Access: a[...] (offset calculation)
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Literal: INT (5)
 [PROD] Generating code
-[PROD] Assignment: 'x' := $t01
+[PROD] Parsed Array Access: c[...]
+[PROD] Array Access: c[...] (offset calculation)
+[PROD] Generating code
+[PROD] Generating code
+[PROD] Generating code
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Array Store: c[...]
 --- END OF ANALYSIS ---

@@ -1,5 +1,3 @@
-#include "handlers.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +10,7 @@
 #include "../../utils/report.h"
 #include "../expression/expression_utils.h"
 #include "globals.h"
+#include "handlers.h"
 
 ExprResult handle_primary_id(char* token_id) {
     ExprResult expr;
@@ -82,35 +81,16 @@ ExprResult handle_array_access(char* token_id, ExprResult index_expr) {
         return res;
     }
 
-    if (index_expr.type != TYPE_INT) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Array index must be an integer");
-        free(token_id);
-        free(entry);
-        if (index_expr.addr) free(index_expr.addr);
-        return res;
-    }
-
-    if (index_expr.is_constant) {
-        int idx = index_expr.value.int_val;
-        if (idx < 0 || idx >= entry->size) {
-            REPORT_SEMANTIC_ERROR(
-                current_location(),
-                "Array index out of bounds. Accessing '%s[%d]' but size is %d.",
-                token_id, idx, entry->size);
-            free(token_id);
-            free(entry);
-            return res;
-        }
-    }
-
     log_production("Array Access: %s[...] (offset calculation)", token_id);
 
-    ExprResult size_lit = make_literal_result(TYPE_INT, 4);
-    ExprResult rel_offset = eval_mul(index_expr, size_lit);
-    ExprResult base_lit = make_literal_result(TYPE_INT, entry->base_addr);
-    ExprResult final_offset = eval_add(base_lit, rel_offset);
-
+    ExprResult final_offset =
+        calculate_array_offset(entry, index_expr, token_id);
+    if (final_offset.type == TYPE_VOID) {
+        free(token_id);
+        free(entry);
+        return res;
+    }
+    
     res.type = entry->type;
     res.is_constant = 0;
     res.is_array = 0;
