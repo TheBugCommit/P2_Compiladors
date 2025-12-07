@@ -4,6 +4,7 @@
 #include "data_types.h"
 #include "../declarator_list.h"
 #include "handlers_utils.h"
+#include "handlers_io.h"
 
 void handle_simple_declaration(DATA_TYPE declared_type, DeclaratorListNode *list);
 void handle_assigment_sentence(char * token_id, ExprResult expression);

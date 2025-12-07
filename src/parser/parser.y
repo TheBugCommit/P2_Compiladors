@@ -151,10 +151,7 @@ assignment_sentence:
 ;
 
 expression_sentence:
-    arith_expr 
-    {
-        report_expression(current_location(), $1);
-    }
+    arith_expr { handle_put_statement($1); }
 ;
 
 /* Level 5: Sum, Sub, Unary +/- */

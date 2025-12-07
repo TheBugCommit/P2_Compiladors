@@ -1,28 +1,26 @@
 --- START OF ANALYSIS ---
+[PROD] Multiline comment start on row: 1 col: 0
+[PROD] Multicomment skipping characters
+[PROD] Multicomment skipping characters
+[PROD] Multicomment skipping characters
+[PROD] Multicomment skipping characters
+[PROD] Multiline comment closed on row: 15 col: 9
 [PROD] Type: int
-[PROD] Declared VAR: 'y' (Type: INT)
 [PROD] Declared VAR: 'x' (Type: INT)
-[PROD] Literal: INT (1)
-[PROD] Assignment: 'x' := 1
-[PROD] Literal: INT (1)
-[PROD] Assignment: 'y' := 1
-[PROD] Literal: INT (4)
-[PROD] Marker M: Label 4
+[PROD] Type: float
+[PROD] Declared VAR: 'z' (Type: FLOAT)
+[PROD] Declared VAR: 'y' (Type: FLOAT)
 [PROD] Literal: INT (3)
-[PROD] Marker M: Label 5
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Literal: INT (2)
-[PROD] Strength Reduction: x * 2 -> x + x
-[PROD] Generating code
-[PROD] Assignment: 'y' := $t03
-[PROD] Control: Repeat Loop Closed (Jumping to 5)
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Literal: INT (1)
-[PROD] Generating code
-[PROD] Assignment: 'x' := $t02
-[PROD] Expression: Identifier 'y' -> Type: INT
+[PROD] Assignment: 'x' := 3
+[PROD] Literal: FLOAT (3)
+[PROD] Assignment: 'y' := 3
+[PROD] Expression: Identifier 'y' -> Type: FLOAT
 [PROD] Expression: Identifier 'x' -> Type: INT
 [PROD] Generating code
-[PROD] Assignment: 'y' := $t02
-[PROD] Control: Repeat Loop Closed (Jumping to 4)
+[PROD] Generating runtime loop for POW
+[PROD] Assignment: 'x' := $t01
+[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] IO: Generating PUT for INT expression
+[PROD] Expression: Identifier 'y' -> Type: FLOAT
+[PROD] IO: Generating PUT for FLOAT expression
 --- END OF ANALYSIS ---
