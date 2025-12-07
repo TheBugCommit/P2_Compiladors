@@ -11,5 +11,6 @@ ExprResult eval_mod(ExprResult a, ExprResult b);
 ExprResult eval_pow(ExprResult a, ExprResult b);
 ExprResult eval_unary_minus(ExprResult a);
 ExprResult eval_unary_plus(ExprResult a);
+ExprResult eval_cast(DATA_TYPE target_type, ExprResult expr);
 
 #endif

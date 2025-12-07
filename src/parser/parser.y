@@ -191,11 +191,8 @@ primary:
     TK_LPAREN arith_expr TK_RPAREN { $$ = $2; log_production("Expression: Parenthesized"); }
     | literal { $$ = $1; }
     | TK_ID { $$ = handle_primary_id($1); }
-    | TK_ID TK_LBRACKET arith_expr TK_RBRACKET 
-    {
-        log_production("Parsed Array Access: %s[...]", $1);
-        $$ = handle_array_access($1, $3);
-    }
+    | primitive_type TK_LPAREN arith_expr TK_RPAREN { $$ = eval_cast($1, $3); }
+    | TK_ID TK_LBRACKET arith_expr TK_RBRACKET { $$ = handle_array_access($1, $3);}
 ;
 
 literal:

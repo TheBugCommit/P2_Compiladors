@@ -23,8 +23,6 @@ ExprResult calculate_array_offset(sym_value_type* entry, ExprResult index_expr,
                 current_location(),
                 "Array index out of bounds. Accessing '%s[%d]' but size is %d.",
                 token_id, idx, entry->size);
-            free(token_id);
-            free(entry);
             return res;
         }
     }

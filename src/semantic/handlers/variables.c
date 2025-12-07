@@ -34,19 +34,6 @@ ExprResult handle_primary_id(char* token_id) {
         expr.is_constant = entry->is_constant;
         expr.addr = strdup(entry->addr);
 
-        /*if (entry->is_constant) {
-            TODO: Constant propagation (vigilar amb repeat)
-            expr.addr = malloc(ADDRESS_SIZE);
-            if (entry->type == TYPE_INT)
-                sprintf(expr.addr, "%d", entry->value.int_val);
-            else
-                sprintf(expr.addr, "%g", entry->value.float_val);
-
-            log_production("Constant Propagation: Using value '%s' for id '%s'",
-                           expr.addr, token_id);
-        } else {
-            expr.addr = strdup(entry->addr);
-        }*/
         log_production("Expression: Identifier '%s' -> Type: %s", token_id,
                        TYPE_NAME[expr.type]);
     }
@@ -80,6 +67,16 @@ ExprResult handle_array_access(char* token_id, ExprResult index_expr) {
         return res;
     }
 
+    if (!entry->is_initialized) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Variable '%s' is not inicialized", token_id);
+        free(token_id);
+        free(entry);
+        if (index_expr.addr) free(index_expr.addr);
+        return res;
+    }
+
+
     log_production("Array Access: %s[...] (offset calculation)", token_id);
 
     ExprResult final_offset =
@@ -89,7 +86,7 @@ ExprResult handle_array_access(char* token_id, ExprResult index_expr) {
         free(entry);
         return res;
     }
-    
+
     res.type = entry->type;
     res.is_constant = 0;
     res.is_array = 0;

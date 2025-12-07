@@ -22,42 +22,67 @@ void handle_assigment_sentence(char* token_id, ExprResult expression) {
                               token_id);
         free(token_id);
         free(entry);
+        if (expression.addr) free(expression.addr);
+        return;
+    }
+
+    if (entry->type != expression.type) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Type mismatch in assigment.");
+        free(token_id);
+        free(entry);
+        if (expression.addr) free(expression.addr);
         return;
     }
 
     if (entry->is_array) {
-        REPORT_SEMANTIC_ERROR(
-            current_location(),
-            "Cannot assign to array '%s' directly. Use index.", token_id);
+        if (!expression.is_array) {
+            REPORT_SEMANTIC_ERROR(current_location(),
+                                  "Cannot assign scalar to array '%s'. "
+                                  "Expecting array of same size.",
+                                  token_id);
+            free(token_id);
+            free(entry);
+            if (expression.addr) free(expression.addr);
+            return;
+        }
+
+        if (entry->size != expression.size) {
+            REPORT_SEMANTIC_ERROR(current_location(),
+                                  "Size mismatch: Dest[%d] vs Src[%d]",
+                                  entry->size, expression.size);
+            free(token_id);
+            free(entry);
+            if (expression.addr) free(expression.addr);
+            return;
+        }
+
+        log_production("Array Block Copy: %s := %s", token_id, expression.addr);
+        emit_assign(token_id, expression.addr);
+
+        entry->is_initialized = 1;
+        sym_enter(token_id, entry);
+
         free(token_id);
         free(entry);
+        if (expression.addr) free(expression.addr);
         return;
     }
 
-    expression = ensure_type(expression, entry->type);
+    if (expression.is_array) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Cannot assign array to scalar '%s'.", token_id);
+        free(token_id);
+        free(entry);
+        if (expression.addr) free(expression.addr);
+        return;
+    }
+
     emit_assign(token_id, expression.addr);
 
     log_production("Assignment: '%s' := %s", token_id, expression.addr);
 
     entry->is_initialized = 1;
-
-    /* TODO: Constant propagation (vigilar amb repeat)
-    if (expression.is_constant) {
-         entry->is_constant = 1;
-
-         if (entry->type == TYPE_INT) {
-             entry->value.int_val = (expression.type == TYPE_FLOAT)
-                                        ? (int)expression.value.float_val
-                                        : expression.value.int_val;
-         } else {
-             entry->value.float_val = (expression.type == TYPE_INT)
-                                          ? (float)expression.value.int_val
-                                          : expression.value.float_val;
-         }
-         log_production("Constant Propagation: Variable '%s' is now constant
-    %s", token_id, expression.addr); } else { entry->is_constant = 0;
-     }*/
-
     entry->is_constant = 0;
     sym_enter(token_id, entry);
 
@@ -77,6 +102,7 @@ void handle_array_assignment(char* token_id, ExprResult index_expr,
                               token_id);
         free(token_id);
         free(entry);
+        if (value_expr.addr) free(value_expr.addr);
         return;
     }
     if (!entry->is_array) {
@@ -84,6 +110,16 @@ void handle_array_assignment(char* token_id, ExprResult index_expr,
                               "Variable '%s' is not an array", token_id);
         free(token_id);
         free(entry);
+        if (value_expr.addr) free(value_expr.addr);
+        return;
+    }
+
+    if (entry->type != value_expr.type) {
+        REPORT_SEMANTIC_ERROR(current_location(),
+                              "Type mismatch in assigment.");
+        free(token_id);
+        free(entry);
+        if (value_expr.addr) free(value_expr.addr);
         return;
     }
 
@@ -95,10 +131,10 @@ void handle_array_assignment(char* token_id, ExprResult index_expr,
         return;
     }
 
-    value_expr = ensure_type(value_expr, entry->type);
-    char* final_val_addr = value_expr.addr;
+    entry->is_initialized = 1;
+    sym_enter(token_id, entry);
 
-    emit_array_store(token_id, final_offset.addr, final_val_addr);
+    emit_array_store(token_id, final_offset.addr, value_expr.addr);
 
     log_production("Array Store: %s[...]", token_id);
 

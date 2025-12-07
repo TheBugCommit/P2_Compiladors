@@ -1,12 +1,16 @@
 #include "expression.h"
-#include "expression_priv.h"
+
 #include <stdlib.h>
-#include "../../utils/log.h"
+
 #include "../../codegen/codegen.h"
 #include "../../codegen/gen_temps.h"
+#include "../../utils/log.h"
+#include "expression_priv.h"
+#include "globals.h"
 
-static ExprResult eval_arithmetic_pipeline(ExprResult a, ExprResult b, ArithOp op,
-                                           char* op_int, char* op_float) {
+static ExprResult eval_arithmetic_pipeline(ExprResult a, ExprResult b,
+                                           ArithOp op, char* op_int,
+                                           char* op_float) {
     ExprResult res = {TYPE_VOID};
 
     if (!check_arithmetic_validity(&a, &b, op)) {
@@ -40,6 +44,21 @@ ExprResult eval_mod(ExprResult a, ExprResult b) {
 }
 ExprResult eval_pow(ExprResult a, ExprResult b) {
     return eval_arithmetic_pipeline(a, b, OP_POW, "", "");
+}
+
+ExprResult eval_cast(DATA_TYPE target_type, ExprResult expr) {
+    if (expr.type == TYPE_VOID) return expr;
+
+    if (!is_numeric(&expr)) {
+        if (expr.addr) free(expr.addr);
+        ExprResult err = {TYPE_VOID};
+        return err;
+    }
+
+    log_production("Explicit Cast: Converting %s to %s", TYPE_NAME[expr.type],
+                   TYPE_NAME[target_type]);
+
+    return ensure_type(expr, target_type);
 }
 
 ExprResult eval_unary_minus(ExprResult a) {

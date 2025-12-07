@@ -39,6 +39,7 @@ ExprResult make_literal_result(DATA_TYPE type, double val) {
     ExprResult res;
     res.type = type;
     res.is_constant = 1;
+    res.is_array = 0;
     res.addr = (char*)malloc(ADDRESS_SIZE);
 
     if (type == TYPE_INT) {

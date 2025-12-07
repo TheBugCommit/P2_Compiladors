@@ -1,35 +1,30 @@
 --- START OF ANALYSIS ---
-[PROD] Type: float
-[PROD] Declared VAR: 'y' (Type: FLOAT)
-[PROD] Declared VAR: 'x' (Type: FLOAT)
 [PROD] Type: int
-[PROD] Declared VAR: 'fact' (Type: INT)
-[PROD] Declared VAR: 'n' (Type: INT)
-[PROD] Declared VAR: 'i' (Type: INT)
-[PROD] Assignment: 'x' := 5.0
-[PROD] Assignment: 'i' := 3
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Generating code
-[PROD] Generating code
-[PROD] Expression: Identifier 'x' -> Type: FLOAT
-[PROD] Generating code
-[PROD] Assignment: 'y' := $t01
-[PROD] Assignment: 'n' := 10
-[PROD] Assignment: 'fact' := 1
-[PROD] Assignment: 'i' := 2
-[PROD] Expression: Identifier 'n' -> Type: INT
-[PROD] Generating code
-[PROD] Control: Repeat Start (Count 0 to $t01)
-[PROD] Marker M: Label 13
-[PROD] Expression: Identifier 'fact' -> Type: INT
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Generating code
-[PROD] Assignment: 'fact' := $t03
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Generating code
-[PROD] Assignment: 'i' := $t03
-[PROD] Control: Repeat End
-[PROD] Expression: Identifier 'fact' -> Type: INT
+[PROD] Declared ARRAY: 'a' [1] (Type: INT)
+[PROD] Declared VAR: 'x' (Type: INT)
+[PROD] Type: float
+[PROD] Declared ARRAY: 'b' [1] (Type: FLOAT)
+[PROD] Declared VAR: 'y' (Type: FLOAT)
+[PROD] Assignment: 'x' := 1
+[PROD] Assignment: 'y' := 3.12
+[PROD] Expression: Identifier 'x' -> Type: INT
 [PROD] IO: Generating PUT for INT expression
+[PROD] Expression: Identifier 'y' -> Type: FLOAT
+[PROD] IO: Generating PUT for FLOAT expression
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Array Store: a[...]
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] Array Store: b[...]
+[PROD] Array Access: a[...] (offset calculation)
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] IO: Generating PUT for INT expression
+[PROD] Array Access: b[...] (offset calculation)
+[PROD] Optimization: Constant Folding applied
+[PROD] Optimization: Constant Folding applied
+[PROD] IO: Generating PUT for FLOAT expression
+[PROD] Skipped full comment line
+[PROD] Expression: Identifier 'a' -> Type: INT
 --- END OF ANALYSIS ---
