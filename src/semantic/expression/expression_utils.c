@@ -1,3 +1,5 @@
+#include "expression_utils.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +8,6 @@
 #include "../../codegen/gen_temps.h"
 #include "../../utils/error.h"
 #include "../../utils/log.h"
-#include "expression_utils.h"
 #include "expression_priv.h"
 #include "globals.h"
 
@@ -63,17 +64,28 @@ ExprResult ensure_type(ExprResult expr, DATA_TYPE target_type) {
             return make_literal_result(TYPE_FLOAT, (float)expr.value.int_val);
         }
 
-        char* t_conv = gen_new_temp();
+        char* t_conv =
+            is_temporary(expr.addr) ? strdup(expr.addr) : gen_new_temp();
         emit_unary("I2F", t_conv, expr.addr);
-
-        gen_release_temp(expr.addr);
         if (expr.addr) free(expr.addr);
 
         expr.addr = t_conv;
         expr.type = TYPE_FLOAT;
-        expr.is_constant = 0;
-        return expr;
+    } else {
+        if (expr.is_constant) {
+            if (expr.addr) free(expr.addr);
+            return make_literal_result(TYPE_INT, expr.value.float_val);
+        }
+
+        char* t_conv =
+            is_temporary(expr.addr) ? strdup(expr.addr) : gen_new_temp();
+        emit_unary("F2I", t_conv, expr.addr);
+        if (expr.addr) free(expr.addr);
+
+        expr.addr = t_conv;
+        expr.type = TYPE_INT;
     }
 
+    expr.is_constant = 0;
     return expr;
 }
