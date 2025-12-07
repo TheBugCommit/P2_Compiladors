@@ -6,7 +6,6 @@
 #include "../src/utils/log.h"
 #include "../src/symtab/symtab.h"
 #include "../src/utils/error.h"
-#include "../src/utils/report.h"
 #include "../src/semantic/declarator_list.h"
 #include "../src/semantic/handlers/handlers.h"
 #include "../src/semantic/expression/expression.h"

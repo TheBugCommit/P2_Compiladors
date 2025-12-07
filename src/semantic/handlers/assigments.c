@@ -7,7 +7,6 @@
 #include "../../symtab/symtab.h"
 #include "../../utils/error.h"
 #include "../../utils/log.h"
-#include "../../utils/report.h"
 #include "../expression/expression.h"
 #include "../expression/expression_utils.h"
 #include "globals.h"
