@@ -1,5 +1,5 @@
-int i, j, k, base_i
-float f, g, base_f
+int i, j, k
+float f, g
 
 i := 5
 f := 5.5

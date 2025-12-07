@@ -49,8 +49,9 @@ extern int yydebug;
 
   #include "data_types.h"
   #include "../src/semantic/declarator_list.h"
+  #include "../src/semantic/control/control.h"
 
-#line 54 "build/parser.tab.h"
+#line 55 "build/parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -93,18 +94,18 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 25 "src/parser/parser.y"
+#line 26 "src/parser/parser.y"
 
     char *text;
     DATA_TYPE data_type;
     DeclaratorListNode *decl_list;
-
+    LoopContext loop_ctx;
     int int_val;
     float float_val;
 
     ExprResult expr_val;
 
-#line 108 "build/parser.tab.h"
+#line 109 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -9,6 +9,7 @@
 #include "../src/semantic/declarator_list.h"
 #include "../src/semantic/handlers/handlers.h"
 #include "../src/semantic/expression/expression.h"
+#include "../src/semantic/expression/expression_utils.h"
 #include "../src/semantic/control/control.h"
 #include "../src/codegen/codegen.h"
 
@@ -19,13 +20,14 @@ extern int yylex();
 %code requires {
   #include "data_types.h"
   #include "../src/semantic/declarator_list.h"
+  #include "../src/semantic/control/control.h"
 }
 
 %union {
     char *text;
     DATA_TYPE data_type;
     DeclaratorListNode *decl_list;
-
+    LoopContext loop_ctx;
     int int_val;
     float float_val;
 
@@ -51,6 +53,7 @@ extern int yylex();
 %type <expr_val>  arith_expr arith_term unary_expr arith_factor primary literal
 %type <decl_list> declarator_list declarator
 %type <int_val> M
+%type <loop_ctx> repeat_start_action
 %define parse.error detailed
 
 %%
@@ -138,10 +141,13 @@ M:  {
     } 
 ;
 
+repeat_start_action:
+    TK_REPEAT arith_expr optional_newlines TK_DO { $$ = handle_repeat_start($2); }
+;
+
 repeat_sentence:
-    TK_REPEAT arith_expr { $<expr_val>$ = handle_repeat_start($2); }
-    optional_newlines TK_DO M 
-    loop_item_list TK_DONE { handle_repeat_end($<expr_val>3, $6); }
+    repeat_start_action M
+    loop_item_list TK_DONE { handle_repeat_end($1, $2); }
 ;
 
 assignment_sentence:
@@ -193,22 +199,6 @@ primary:
 ;
 
 literal:
-    TK_INT_LIT
-    {
-        $$.type = TYPE_INT;
-        $$.value.int_val = $1;
-        $$.is_constant = 1;
-        $$.addr = malloc(64);
-        sprintf($$.addr, "%d", $1);
-        log_production("Literal: %s (%d)", TYPE_NAME[$$.type], $1);
-    }
-    | TK_FLOAT_LIT
-    {
-        $$.type = TYPE_FLOAT;
-        $$.value.float_val = $1;
-        $$.is_constant = 1;
-        $$.addr = malloc(64);
-        sprintf($$.addr, "%g", $1);
-        log_production("Literal: %s (%g)", TYPE_NAME[$$.type], $1);
-    }
+    TK_INT_LIT { $$ = make_literal_result(TYPE_INT, (float)$1); }
+    | TK_FLOAT_LIT { $$ = make_literal_result(TYPE_FLOAT, $1); }
 %%

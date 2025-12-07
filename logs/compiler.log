@@ -1,26 +1,35 @@
 --- START OF ANALYSIS ---
-[PROD] Multiline comment start on row: 1 col: 0
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multicomment skipping characters
-[PROD] Multiline comment closed on row: 15 col: 9
-[PROD] Type: int
-[PROD] Declared VAR: 'x' (Type: INT)
 [PROD] Type: float
-[PROD] Declared VAR: 'z' (Type: FLOAT)
 [PROD] Declared VAR: 'y' (Type: FLOAT)
-[PROD] Literal: INT (3)
-[PROD] Assignment: 'x' := 3
-[PROD] Literal: FLOAT (3)
-[PROD] Assignment: 'y' := 3
-[PROD] Expression: Identifier 'y' -> Type: FLOAT
-[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] Declared VAR: 'x' (Type: FLOAT)
+[PROD] Type: int
+[PROD] Declared VAR: 'fact' (Type: INT)
+[PROD] Declared VAR: 'n' (Type: INT)
+[PROD] Declared VAR: 'i' (Type: INT)
+[PROD] Assignment: 'x' := 5.0
+[PROD] Assignment: 'i' := 3
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Expression: Identifier 'i' -> Type: INT
 [PROD] Generating code
-[PROD] Generating runtime loop for POW
-[PROD] Assignment: 'x' := $t01
-[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] Generating code
+[PROD] Expression: Identifier 'x' -> Type: FLOAT
+[PROD] Generating code
+[PROD] Assignment: 'y' := $t01
+[PROD] Assignment: 'n' := 10
+[PROD] Assignment: 'fact' := 1
+[PROD] Assignment: 'i' := 2
+[PROD] Expression: Identifier 'n' -> Type: INT
+[PROD] Generating code
+[PROD] Control: Repeat Start (Count 0 to $t01)
+[PROD] Marker M: Label 13
+[PROD] Expression: Identifier 'fact' -> Type: INT
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Generating code
+[PROD] Assignment: 'fact' := $t03
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Generating code
+[PROD] Assignment: 'i' := $t03
+[PROD] Control: Repeat End
+[PROD] Expression: Identifier 'fact' -> Type: INT
 [PROD] IO: Generating PUT for INT expression
-[PROD] Expression: Identifier 'y' -> Type: FLOAT
-[PROD] IO: Generating PUT for FLOAT expression
 --- END OF ANALYSIS ---

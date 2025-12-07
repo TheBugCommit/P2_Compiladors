@@ -9,7 +9,7 @@
 #include "../../utils/log.h"
 #include "../expression/expression_utils.h"
 
-ExprResult handle_repeat_start(ExprResult count_expr) {
+LoopContext handle_repeat_start(ExprResult count_expr) {
     if (count_expr.type != TYPE_INT) {
         REPORT_SEMANTIC_ERROR(current_location(),
                               "Repeat expression must be an INTEGER (got %s)",
@@ -24,27 +24,23 @@ ExprResult handle_repeat_start(ExprResult count_expr) {
                        count_expr.value.int_val);
     }
 
-    char* counter_temp = gen_new_temp();
-    emit_assign(counter_temp, count_expr.addr);
+    LoopContext ctx;
+    ctx.bound_addr = count_expr.addr;
+    ctx.counter_addr = gen_new_temp();
+    emit_assign(ctx.counter_addr, "0");
 
-    ExprResult res = {TYPE_INT};
-    res.addr = counter_temp;
-    res.is_constant = 0;
+    log_production("Control: Repeat Start (Count 0 to %s)", ctx.bound_addr);
 
-    if (count_expr.addr) {
-        gen_release_temp(count_expr.addr);
-        free(count_expr.addr);
-    }
-
-    return res;
+    return ctx;
 }
 
-void handle_repeat_end(ExprResult counter, int start_label) {
-    log_production("Control: Repeat Loop Closed (Jumping to %d)", start_label);
+void handle_repeat_end(LoopContext ctx, int start_label) {
+    emit_binary("ADDI", ctx.counter_addr, ctx.counter_addr, "1");
+    emit_if_goto("LTI", ctx.counter_addr, ctx.bound_addr, start_label);
+    log_production("Control: Repeat End");
 
-    emit_binary("SUBI", counter.addr, counter.addr, "1");
-    emit_if_goto("GEI", counter.addr, "1", start_label);
-    
-    gen_release_temp(counter.addr);
-    if(counter.addr) free(counter.addr);
+    gen_release_temp(ctx.counter_addr);
+    gen_release_temp(ctx.bound_addr);
+    if (ctx.counter_addr) free(ctx.counter_addr);
+    if (ctx.bound_addr) free(ctx.bound_addr);
 }

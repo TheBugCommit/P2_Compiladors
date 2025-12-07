@@ -1,0 +1,16 @@
+float x, y
+int i , n, fact
+
+x := 5.0
+i := 3
+y := i + i * 3 - x
+
+n := 10
+fact := 1
+i := 2
+repeat n - 1 do
+    fact := fact * i
+    i := i + 1
+done
+
+fact
