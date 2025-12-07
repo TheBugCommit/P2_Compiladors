@@ -4,6 +4,7 @@
 #include "../../utils/error.h"
 #include "../expression/expression_utils.h"
 #include "handlers.h"
+#include "handlers_utils.h"
 
 ExprResult calculate_array_offset(sym_value_type* entry, ExprResult index_expr,
                                   char* token_id) {
