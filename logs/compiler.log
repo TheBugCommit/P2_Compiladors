@@ -1,176 +1,28 @@
 --- START OF ANALYSIS ---
 [PROD] Type: int
-[PROD] Declared VAR: 'base_i' (Type: INT)
-[PROD] Declared VAR: 'k' (Type: INT)
-[PROD] Declared VAR: 'j' (Type: INT)
-[PROD] Declared VAR: 'i' (Type: INT)
-[PROD] Type: float
-[PROD] Declared VAR: 'base_f' (Type: FLOAT)
-[PROD] Declared VAR: 'g' (Type: FLOAT)
-[PROD] Declared VAR: 'f' (Type: FLOAT)
-[PROD] Literal: INT (5)
-[PROD] Assignment: 'i' := 5
-[PROD] Literal: FLOAT (5.5)
-[PROD] Assignment: 'f' := 5.5
-[PROD] Skipped full comment line
-[PROD] Literal: INT (10)
-[PROD] Literal: INT (20)
-[PROD] Skipped full comment line
-[PROD] Optimization: Constant Folding applied
-[PROD] Assignment: 'j' := 30
-[PROD] Literal: FLOAT (2.5)
-[PROD] Literal: FLOAT (4)
-[PROD] Skipped full comment line
-[PROD] Optimization: Constant Folding applied
-[PROD] Assignment: 'g' := 10.0
-[PROD] Literal: INT (2)
-[PROD] Literal: INT (3)
-[PROD] Skipped full comment line
-[PROD] Optimization: Constant Folding applied
-[PROD] Assignment: 'j' := 8
-[PROD] Literal: INT (2)
-[PROD] Literal: INT (2)
-[PROD] Optimization: Constant Folding Unary Minus
-[PROD] Expression: Parenthesized
-[PROD] Skipped full comment line
-[PROD] Optimization: Constant Folding applied
-[PROD] Assignment: 'g' := 0.25
-[PROD] Literal: INT (5)
-[PROD] Skipped full comment line
-[PROD] Optimization: Constant Folding Unary Minus
-[PROD] Assignment: 'j' := -5
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x + 0 -> x
-[PROD] Assignment: 'j' := i
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Algebraic Opt: 0 + x -> x
-[PROD] Assignment: 'j' := i
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x - 0 -> x
-[PROD] Assignment: 'j' := i
-[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Declared VAR: 'y' (Type: INT)
+[PROD] Declared VAR: 'x' (Type: INT)
 [PROD] Literal: INT (1)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x * 1 -> x
-[PROD] Assignment: 'j' := i
+[PROD] Assignment: 'x' := 1
 [PROD] Literal: INT (1)
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Algebraic Opt: 1 * x -> x
-[PROD] Assignment: 'j' := i
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (1)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x / 1 -> x
-[PROD] Assignment: 'j' := i
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x * 0 -> 0
-[PROD] Assignment: 'j' := 0
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Algebraic Opt: x * 0 -> 0
-[PROD] Assignment: 'j' := 0
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (1)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x % 1 -> 0
-[PROD] Assignment: 'j' := 0
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (2)
-[PROD] Skipped full comment line
-[PROD] Strength Reduction: x * 2 -> x + x
-[PROD] Generating code
-[PROD] Assignment: 'j' := $t01
-[PROD] Literal: INT (2)
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Strength Reduction: 2 * x -> x + x
-[PROD] Generating code
-[PROD] Assignment: 'j' := $t01
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (2)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Optimization: Loop Unrolling POW (n=2)
-[PROD] Assignment: 'j' := $t01
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (0)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x ** 0 -> 1
-[PROD] Assignment: 'j' := 1
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (1)
-[PROD] Skipped full comment line
-[PROD] Algebraic Opt: x ** 1 -> x
-[PROD] Assignment: 'j' := i
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (3)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Optimization: Loop Unrolling POW (n=3)
-[PROD] Assignment: 'j' := $t01
-[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Assignment: 'y' := 1
 [PROD] Literal: INT (4)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Optimization: Loop Unrolling POW (n=4)
-[PROD] Assignment: 'j' := $t01
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (5)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Generating runtime loop for POW
-[PROD] Assignment: 'j' := $t01
+[PROD] Marker M: Label 4
 [PROD] Literal: INT (3)
-[PROD] Assignment: 'k' := 3
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'k' -> Type: INT
-[PROD] Generating code
-[PROD] Generating runtime loop for POW
-[PROD] Assignment: 'j' := $t01
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'f' -> Type: FLOAT
+[PROD] Marker M: Label 5
+[PROD] Expression: Identifier 'x' -> Type: INT
 [PROD] Literal: INT (2)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Assignment: 'g' := $t01
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: FLOAT (2.5)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Assignment: 'g' := $t01
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Expression: Identifier 'i' -> Type: INT
-[PROD] Literal: INT (2)
-[PROD] Skipped full comment line
 [PROD] Strength Reduction: x * 2 -> x + x
 [PROD] Generating code
+[PROD] Assignment: 'y' := $t03
+[PROD] Control: Repeat Loop Closed (Jumping to 5)
+[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] Literal: INT (1)
 [PROD] Generating code
-[PROD] Assignment: 'j' := $t01
-[PROD] Skipped full comment line
-[PROD] Expression: Identifier 'f' -> Type: FLOAT
-[PROD] Literal: FLOAT (1)
+[PROD] Assignment: 'x' := $t02
+[PROD] Expression: Identifier 'y' -> Type: INT
+[PROD] Expression: Identifier 'x' -> Type: INT
 [PROD] Generating code
-[PROD] Expression: Parenthesized
-[PROD] Literal: INT (2)
-[PROD] Skipped full comment line
-[PROD] Generating code
-[PROD] Optimization: Loop Unrolling POW (n=2)
-[PROD] Assignment: 'g' := $t01
-[PROD] Skipped comment until EOL
+[PROD] Assignment: 'y' := $t02
+[PROD] Control: Repeat Loop Closed (Jumping to 4)
 --- END OF ANALYSIS ---

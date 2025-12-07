@@ -10,6 +10,8 @@
 #include "../src/semantic/declarator_list.h"
 #include "../src/semantic/handlers/handlers.h"
 #include "../src/semantic/expression/expression.h"
+#include "../src/semantic/control/control.h"
+#include "../src/codegen/codegen.h"
 
 extern int yylex();
 
@@ -49,8 +51,7 @@ extern int yylex();
 %type <data_type> primitive_type
 %type <expr_val>  arith_expr arith_term unary_expr arith_factor primary literal
 %type <decl_list> declarator_list declarator
-//%type <int_val> repeat_sentence
-
+%type <int_val> M
 %define parse.error detailed
 
 %%
@@ -72,6 +73,12 @@ item_list:
 program_item:
     simple_declaration
     | sentence
+;
+
+loop_item_list:
+    /* buit */
+    | loop_item_list program_item
+    | loop_item_list TK_NEWLINE
 ;
 
 optional_newlines:
@@ -123,28 +130,20 @@ declarator:
 sentence:
     assignment_sentence end_of_stmt
     | expression_sentence end_of_stmt
-    //| repeat_sentence
+    | repeat_sentence end_of_stmt
 ;
 
-/*
-TODO: Com es faria per permetre declaracions de variables dins dun bucle, sense que peti 
+M:  { 
+        $$ = gen_get_label(); 
+        log_production("Marker M: Label %d", $$);
+    } 
+;
+
 repeat_sentence:
-    TK_REPEAT arith_expr 
-    {
-        $<int_val>$ = gen_get_label(); 
-    }
-    TK_DO  item_list TK_DONE
-    {
-        int start_label = $3; // L'etiqueta que hem guardat a la posició 3
-        char *counter = $2.addr;       // La variable on tenim el número de repeticions
-
-        emit_binary("SUBI", counter, counter, "1");
-
-        emit_if_goto("GEI", counter, "1", start_label);
-        
-        log_production("Repeat loop generated (Start label: %d)", start_label);
-    }
-;*/
+    TK_REPEAT arith_expr { $<expr_val>$ = handle_repeat_start($2); }
+    optional_newlines TK_DO M 
+    loop_item_list TK_DONE { handle_repeat_end($<expr_val>3, $6); }
+;
 
 assignment_sentence:
     TK_ID TK_ASSIGN arith_expr { handle_assigment_sentence($1, $3); }
