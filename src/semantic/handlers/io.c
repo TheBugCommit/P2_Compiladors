@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "../../codegen/codegen.h"
+#include "../../codegen/opcodes.h"
 #include "../../codegen/gen_temps.h"
 #include "../../utils/error.h"
 #include "../../utils/log.h"
@@ -26,7 +27,7 @@ void handle_put_statement(ExprResult expr) {
     log_production("IO: Generating PUT for %s expression",
                    TYPE_NAME[expr.type]);
 
-    const char* proc_name = (expr.type == TYPE_INT) ? "PUTI" : "PUTF";
+    const char* proc_name = (expr.type == TYPE_INT) ? PROC_PUTI : PROC_PUTF;
 
     emit_io(expr.addr, proc_name, 1);
 

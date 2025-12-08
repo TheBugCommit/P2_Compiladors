@@ -1,53 +1,38 @@
 --- START OF ANALYSIS ---
+[PROD] Type: float
+[PROD] Declared VAR: 'y' (Type: FLOAT)
+[PROD] Declared VAR: 'x' (Type: FLOAT)
 [PROD] Type: int
-[PROD] Declared ARRAY: 'c' [30] (Type: INT)
-[PROD] Declared VAR: 'b' (Type: INT)
-[PROD] Declared ARRAY: 'a' [20] (Type: INT)
-[PROD] Type: float
-[PROD] Declared ARRAY: 'f' [30] (Type: FLOAT)
-[PROD] Declared VAR: 'e' (Type: FLOAT)
-[PROD] Declared ARRAY: 'd' [20] (Type: FLOAT)
-[PROD] Assignment: 'b' := 2
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Array Store: a[...]
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Array Store: c[...]
-[PROD] Expression: Identifier 'b' -> Type: INT
-[PROD] Array Access: a[...] (offset calculation)
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Generating code
-[PROD] Array Access: c[...] (offset calculation)
+[PROD] Declared VAR: 'fact' (Type: INT)
+[PROD] Declared VAR: 'n' (Type: INT)
+[PROD] Declared VAR: 'i' (Type: INT)
+[PROD] Assignment: 'x' := 5.0
+[PROD] Assignment: 'i' := 3
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Expression: Identifier 'i' -> Type: INT
 [PROD] Generating code
 [PROD] Generating code
+[PROD] Expression: Identifier 'x' -> Type: FLOAT
 [PROD] Generating code
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Array Store: c[...]
-[PROD] Type: float
-[PROD] Array Access: c[...] (offset calculation)
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Array Access: c[...] (offset calculation)
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'y' := $t01
+[PROD] Assignment: 'n' := 10
+[PROD] Assignment: 'fact' := 1
+[PROD] Assignment: 'i' := 2
+[PROD] Expression: Identifier 'n' -> Type: INT
 [PROD] Generating code
-[PROD] Explicit Cast: Converting INT to FLOAT
-[PROD] Optimization: Constant Folding applied
-[PROD] Optimization: Constant Folding applied
-[PROD] Array Store: d[...]
-[PROD] Skipped full comment line
-[PROD] Type: int
-[PROD] Expression: Identifier 'd' -> Type: FLOAT
-[PROD] Expression: Identifier 'b' -> Type: INT
-[PROD] Expression: Identifier 'a' -> Type: INT
-[PROD] Type: float
-[PROD] Recovered from identifier list error
-[PROD] Type: float
-[PROD] Multiline comment start on row: 17 col: 0
+[PROD] Control: Repeat Start (Count 0 to $t01)
+[PROD] Marker M: Label 13
+[PROD] Expression: Identifier 'fact' -> Type: INT
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Generating code
+[PROD] Assignment: 'fact' := $t03
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Generating code
+[PROD] Assignment: 'i' := $t03
+[PROD] Control: Repeat End
+[PROD] Expression: Identifier 'fact' -> Type: INT
+[PROD] IO: Generating PUT for INT expression
+[PROD] Multiline comment start on row: 18 col: 0
 [PROD] Multicomment skipping characters
-[PROD] Multiline comment closed on row: 36 col: 0
+[PROD] Multiline comment closed on row: 40 col: 0
 --- END OF ANALYSIS ---

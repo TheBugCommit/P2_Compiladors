@@ -2,6 +2,7 @@
 #define CODEGEN_H
 
 #include <stdio.h>
+#include "opcodes.h"
 
 typedef struct {
     char* op;

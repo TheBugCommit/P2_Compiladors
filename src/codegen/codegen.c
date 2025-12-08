@@ -65,13 +65,13 @@ void emit_unary(const char* op, const char* dest, const char* arg1) {
 }
 
 void emit_assign(const char* dest, const char* src) {
-    emit(":=", dest, src, NULL);
+    emit(OC_ASSIGN, dest, src, NULL);
 }
 
 void emit_goto(int label) {
     char label_str[20];
     sprintf(label_str, "%d", label);
-    emit("GOTO", NULL, label_str, NULL);
+    emit(OC_GOTO, NULL, label_str, NULL);
 }
 
 void emit_if_goto(const char* op, const char* arg1, const char* arg2, int label) {
@@ -79,34 +79,34 @@ void emit_if_goto(const char* op, const char* arg1, const char* arg2, int label)
     sprintf(label_str, "%d", label);
 
     char full_op[32];
-    sprintf(full_op, "IF %s", op);
+    sprintf(full_op, "%s %s", OC_IF, op);
 
     emit(full_op, label_str, arg1, arg2);
 }
 
 void emit_io(const char* param, const char* prod, const int args) {
-    emit("PARAM", NULL, param, NULL);
+    emit(OC_PARAM, NULL, param, NULL);
 
     char call_arg[64];
     sprintf(call_arg, "%s, %d", prod, args);
-    emit("CALL", NULL, call_arg, NULL);
+    emit(OC_CALL, NULL, call_arg, NULL);
 }
 
 void emit_array_load(const char* dest, const char* array_name,
                      const char* offset) {
     char ref[128];
     sprintf(ref, "%s[%s]", array_name, offset);
-    emit(":=", dest, ref, NULL);
+    emit(OC_ASSIGN, dest, ref, NULL);
 }
 
 void emit_array_store(const char* array_name, const char* offset,
                       const char* value) {
     char ref[128];
     sprintf(ref, "%s[%s]", array_name, offset);
-    emit(":=", ref, value, NULL);
+    emit(OC_ASSIGN, ref, value, NULL);
 }
 
-void emit_halt() { emit("HALT", NULL, NULL, NULL); }
+void emit_halt() { emit(OC_HALT, NULL, NULL, NULL); }
 
 void print_quads() {
     if (!out) return;
@@ -121,24 +121,24 @@ void print_quads() {
             continue;
         }
 
-        if (strcmp(q->op, ":=") == 0) {
-            fprintf(out, "%s := %s", q->res, q->arg1);
-        } else if (strcmp(q->op, "GOTO") == 0) {
-            fprintf(out, "GOTO %s", q->arg1);
-        } else if (strncmp(q->op, "IF", 2) == 0) {
+        if (strcmp(q->op, OC_ASSIGN) == 0) {
+            fprintf(out, "%s %s %s", q->res, OC_ASSIGN, q->arg1);
+        } else if (strcmp(q->op, OC_GOTO) == 0) {
+            fprintf(out, "%s %s",OC_GOTO, q->arg1);
+        } else if (strncmp(q->op, OC_IF, 2) == 0) {
             char* rel = q->op + 3;
-            fprintf(out, "IF %s %s %s GOTO %s", q->arg1, rel, q->arg2, q->res);
-        } else if (strcmp(q->op, "PARAM") == 0) {
-            fprintf(out, "PARAM %s", q->arg1);
-        } else if (strcmp(q->op, "CALL") == 0) {
-            fprintf(out, "CALL %s", q->arg1);
-        } else if (strcmp(q->op, "HALT") == 0) {
-            fprintf(out, "HALT");
+            fprintf(out, "%s %s %s %s %s %s", OC_IF, q->arg1, rel, q->arg2, OC_GOTO, q->res);
+        } else if (strcmp(q->op, OC_PARAM) == 0) {
+            fprintf(out, "%s %s", OC_PARAM, q->arg1);
+        } else if (strcmp(q->op, OC_CALL) == 0) {
+            fprintf(out, "%s %s", OC_CALL, q->arg1);
+        } else if (strcmp(q->op, OC_HALT) == 0) {
+            fprintf(out, OC_HALT);
         } else {
             if (q->arg2) {
-                fprintf(out, "%s := %s %s %s", q->res, q->arg1, q->op, q->arg2);
+                fprintf(out, "%s %s %s %s %s", q->res, OC_ASSIGN, q->arg1, q->op, q->arg2);
             } else {
-                fprintf(out, "%s := %s %s", q->res, q->op, q->arg1);
+                fprintf(out, "%s %s %s %s", q->res, OC_ASSIGN, q->op, q->arg1);
             }
         }
 

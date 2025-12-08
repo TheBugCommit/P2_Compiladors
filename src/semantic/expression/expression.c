@@ -28,19 +28,19 @@ static ExprResult eval_arithmetic_pipeline(ExprResult a, ExprResult b,
 }
 
 ExprResult eval_add(ExprResult a, ExprResult b) {
-    return eval_arithmetic_pipeline(a, b, OP_ADD, "ADDI", "ADDF");
+    return eval_arithmetic_pipeline(a, b, OP_ADD, OC_ADDI, OC_ADDF);
 }
 ExprResult eval_sub(ExprResult a, ExprResult b) {
-    return eval_arithmetic_pipeline(a, b, OP_SUB, "SUBI", "SUBF");
+    return eval_arithmetic_pipeline(a, b, OP_SUB, OC_SUBI, OC_SUBF);
 }
 ExprResult eval_mul(ExprResult a, ExprResult b) {
-    return eval_arithmetic_pipeline(a, b, OP_MUL, "MULI", "MULF");
+    return eval_arithmetic_pipeline(a, b, OP_MUL, OC_MULI, OC_MULF);
 }
 ExprResult eval_div(ExprResult a, ExprResult b) {
-    return eval_arithmetic_pipeline(a, b, OP_DIV, "DIVI", "DIVF");
+    return eval_arithmetic_pipeline(a, b, OP_DIV, OC_DIVI, OC_DIVF);
 }
 ExprResult eval_mod(ExprResult a, ExprResult b) {
-    return eval_arithmetic_pipeline(a, b, OP_MOD, "MODI", "");
+    return eval_arithmetic_pipeline(a, b, OP_MOD, OC_MODI, "");
 }
 ExprResult eval_pow(ExprResult a, ExprResult b) {
     return eval_arithmetic_pipeline(a, b, OP_POW, "", "");
@@ -80,7 +80,7 @@ ExprResult eval_unary_minus(ExprResult a) {
 
     res.type = a.type;
     res.is_constant = 0;
-    char* op_code = (a.type == TYPE_FLOAT) ? "CHSF" : "CHSI";
+    char* op_code = (a.type == TYPE_FLOAT) ? OC_CHSF : OC_CHSI;
 
     if (is_temporary(a.addr)) {
         res.addr = a.addr;

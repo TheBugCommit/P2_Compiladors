@@ -35,8 +35,8 @@ LoopContext handle_repeat_start(ExprResult count_expr) {
 }
 
 void handle_repeat_end(LoopContext ctx, int start_label) {
-    emit_binary("ADDI", ctx.counter_addr, ctx.counter_addr, "1");
-    emit_if_goto("LTI", ctx.counter_addr, ctx.bound_addr, start_label);
+    emit_binary(OC_ADDI, ctx.counter_addr, ctx.counter_addr, "1");
+    emit_if_goto(REL_LTI, ctx.counter_addr, ctx.bound_addr, start_label);
     log_production("Control: Repeat End");
 
     gen_release_temp(ctx.counter_addr);

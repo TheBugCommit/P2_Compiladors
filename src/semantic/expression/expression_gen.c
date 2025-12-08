@@ -66,11 +66,11 @@ ExprResult generate_pow_code(ExprResult a, ExprResult b) {
 
     int start_label = gen_get_label();
 
-    emit_if_goto("GEI", t_cnt, b.addr, start_label + 4);
+    emit_if_goto(REL_GEI, t_cnt, b.addr, start_label + 4);
 
-    char* op_mul = (res.type == TYPE_FLOAT) ? "MULF" : "MULI";
+    char* op_mul = (res.type == TYPE_FLOAT) ? OC_MULF : OC_MULI;
     emit_binary(op_mul, t_res, t_res, a.addr);
-    emit_binary("ADDI", t_cnt, t_cnt, "1");
+    emit_binary(OC_ADDI, t_cnt, t_cnt, "1");
     emit_goto(start_label);
     cleanup_operands(a, b);
     gen_release_temp(t_cnt);

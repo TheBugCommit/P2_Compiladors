@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "../../utils/log.h"
+#include "../../codegen/opcodes.h"
 #include "expression.h"
 #include "expression_priv.h"
 
@@ -119,12 +120,9 @@ ExprResult pow_optimization(ExprResult a, ExprResult b) {
     }
 
     res = clone_result(a);
-    char* op_int = "MULI";
-    char* op_float = "MULF";
-
     for (int i = 1; i < n; i++) {
         ExprResult next_a = clone_result(a);
-        res = generate_arithmetic(res, next_a, op_int, op_float);
+        res = generate_arithmetic(res, next_a, OC_MULI, OC_MULF);
     }
 
     cleanup_operands(a, b);
