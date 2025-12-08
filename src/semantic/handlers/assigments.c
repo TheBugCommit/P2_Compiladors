@@ -12,131 +12,90 @@
 #include "globals.h"
 #include "handlers.h"
 
-void handle_assigment_sentence(char* token_id, ExprResult expression) {
-    sym_value_type* entry = malloc(sizeof(sym_value_type));
-    int res = sym_lookup(token_id, entry);
+static void cleanup_assign(char* id, sym_value_type* e, ExprResult* ex) {
+    if (id) free(id);
+    if (e) free(e);
+    if (ex && ex->addr) free(ex->addr);
+}
 
-    if (res == SYMTAB_NOT_FOUND) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Assignment to undeclared identifier '%s'",
-                              token_id);
-        free(token_id);
-        free(entry);
-        if (expression.addr) free(expression.addr);
+void handle_assigment_sentence(char* token_id, ExprResult expression) {
+    sym_value_type* entry = get_symbol_checked(token_id);
+    if (!entry) {
+        cleanup_assign(token_id, NULL, &expression);
         return;
     }
 
-    if (entry->type != expression.type) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Type mismatch in assigment.");
-        free(token_id);
-        free(entry);
-        if (expression.addr) free(expression.addr);
+    if (!check_types_match(entry->type, expression.type)) {
+        cleanup_assign(token_id, entry, &expression);
         return;
     }
 
     if (entry->is_array) {
-        if (!expression.is_array) {
+        if (expression.is_array) {
+            if (entry->size != expression.size) {
+                REPORT_SEMANTIC_ERROR(current_location(),
+                                      "Size mismatch in array copy.");
+                cleanup_assign(token_id, entry, &expression);
+                return;
+            }
+            log_production("Array Copy: %s := %s", token_id, expression.addr);
+            emit_assign(token_id, expression.addr);
+        } else {
             REPORT_SEMANTIC_ERROR(current_location(),
-                                  "Cannot assign scalar to array '%s'. "
-                                  "Expecting array of same size.",
+                                  "Cannot assign scalar to array '%s'.",
                                   token_id);
-            free(token_id);
-            free(entry);
-            if (expression.addr) free(expression.addr);
+            cleanup_assign(token_id, entry, &expression);
             return;
         }
-
-        if (entry->size != expression.size) {
+    } else {
+        if (expression.is_array) {
             REPORT_SEMANTIC_ERROR(current_location(),
-                                  "Size mismatch: Dest[%d] vs Src[%d]",
-                                  entry->size, expression.size);
-            free(token_id);
-            free(entry);
-            if (expression.addr) free(expression.addr);
+                                  "Cannot assign array to scalar '%s'.",
+                                  token_id);
+            cleanup_assign(token_id, entry, &expression);
             return;
         }
-
-        log_production("Array Block Copy: %s := %s", token_id, expression.addr);
+        log_production("Assignment: '%s' := %s", token_id, expression.addr);
         emit_assign(token_id, expression.addr);
-
-        entry->is_initialized = 1;
-        sym_enter(token_id, entry);
-
-        free(token_id);
-        free(entry);
-        if (expression.addr) free(expression.addr);
-        return;
     }
-
-    if (expression.is_array) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Cannot assign array to scalar '%s'.", token_id);
-        free(token_id);
-        free(entry);
-        if (expression.addr) free(expression.addr);
-        return;
-    }
-
-    emit_assign(token_id, expression.addr);
-
-    log_production("Assignment: '%s' := %s", token_id, expression.addr);
 
     entry->is_initialized = 1;
     entry->is_constant = 0;
     sym_enter(token_id, entry);
 
     gen_release_temp(expression.addr);
-    if (expression.addr) free(expression.addr);
-    free(token_id);
-    free(entry);
+    cleanup_assign(token_id, entry, &expression);
 }
 
 void handle_array_assignment(char* token_id, ExprResult index_expr,
                              ExprResult value_expr) {
-    sym_value_type* entry = malloc(sizeof(sym_value_type));
-    int lookup_res = sym_lookup(token_id, entry);
-
-    if (lookup_res == SYMTAB_NOT_FOUND) {
-        REPORT_SEMANTIC_ERROR(current_location(), "Undeclared array '%s'",
-                              token_id);
-        free(token_id);
-        free(entry);
-        if (value_expr.addr) free(value_expr.addr);
-        return;
-    }
-    if (!entry->is_array) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Variable '%s' is not an array", token_id);
-        free(token_id);
-        free(entry);
-        if (value_expr.addr) free(value_expr.addr);
+    sym_value_type* entry = get_symbol_checked(token_id);
+    if (!entry) {
+        cleanup_assign(token_id, NULL, &value_expr);
+        if (index_expr.addr) free(index_expr.addr);
         return;
     }
 
-    if (entry->type != value_expr.type) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Type mismatch in assigment.");
-        free(token_id);
-        free(entry);
-        if (value_expr.addr) free(value_expr.addr);
+    if (!check_is_array(entry, token_id) ||
+        !check_types_match(entry->type, value_expr.type)) {
+        cleanup_assign(token_id, entry, &value_expr);
+        if (index_expr.addr) free(index_expr.addr);
         return;
     }
 
     ExprResult final_offset =
         calculate_array_offset(entry, index_expr, token_id);
     if (final_offset.type == TYPE_VOID) {
-        free(token_id);
-        free(entry);
+        cleanup_assign(token_id, entry, &value_expr);
+        if (index_expr.addr) free(index_expr.addr);
         return;
     }
 
+    emit_array_store(token_id, final_offset.addr, value_expr.addr);
+    log_production("Array Store: %s[...]", token_id);
+
     entry->is_initialized = 1;
     sym_enter(token_id, entry);
-
-    emit_array_store(token_id, final_offset.addr, value_expr.addr);
-
-    log_production("Array Store: %s[...]", token_id);
 
     if (final_offset.addr) {
         gen_release_temp(final_offset.addr);
