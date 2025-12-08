@@ -27,10 +27,15 @@ ExprResult clone_result(ExprResult original) {
 }
 
 int is_numeric(ExprResult* e) {
-    if (e->type != TYPE_INT && e->type != TYPE_FLOAT) {
-        REPORT_SEMANTIC_ERROR(current_location(),
-                              "Type error: expected numeric type, got %s",
-                              TYPE_NAME[e->type]);
+    if ((e->type != TYPE_INT && e->type != TYPE_FLOAT) || e->is_array) {
+        if(e->is_array) {
+            REPORT_SEMANTIC_ERROR(current_location(),
+                                  "Type error: expected numeric type, got array");
+        } else {
+            REPORT_SEMANTIC_ERROR(current_location(),
+                                  "Type error: expected numeric type, got %s",
+                                  TYPE_NAME[e->type]);
+        }
         return 0;
     }
     return 1;

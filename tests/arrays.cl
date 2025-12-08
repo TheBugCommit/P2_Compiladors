@@ -6,9 +6,9 @@ c[1] := 1 * 5
 c[2] := b + c[a[0] + 5]
 d[0] := float(c[2] + c[1])
 
-a := int(d)
-
 // Errors
+a := int(d)
+b := b + a
 float x[-2]
 float y[0]
 d := 1
