@@ -36,15 +36,11 @@
 #define REL_LTI     "LTI"
 #define REL_GEI     "GEI"
 #define REL_LEI     "LEI"
-#define REL_EQI     "EQI"
-#define REL_NEI     "NEI"
 
 #define REL_GTF     "GTF"
 #define REL_LTF     "LTF"
 #define REL_GEF     "GEF"
 #define REL_LEF     "LEF"
-#define REL_EQF     "EQF"
-#define REL_NEF     "NEF"
 
 #define REL_SUFFIX_I   "I"
 #define REL_SUFFIX_F   "F"
