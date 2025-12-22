@@ -1,3 +1,9 @@
+Instruccions d'execució:
+- Des de l'arrel del projecte compilar-lo amb "make"
+- Seguidament:
+     - make test (executa tots els testos de la carpeta tests/)
+     - make run_one FILE=tests/XXX.cl (executa el test XXX)
+
 Limitacions: 
 - Les potencies nomes poden tenir exponents enters
 
