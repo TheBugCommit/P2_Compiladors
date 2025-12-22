@@ -28,21 +28,27 @@ static ExprResult eval_arithmetic_pipeline(ExprResult a, ExprResult b,
 }
 
 ExprResult eval_add(ExprResult a, ExprResult b) {
+    log_production("Evaluating ADD");
     return eval_arithmetic_pipeline(a, b, OP_ADD, OC_ADDI, OC_ADDF);
 }
 ExprResult eval_sub(ExprResult a, ExprResult b) {
+    log_production("Evaluating SUB");
     return eval_arithmetic_pipeline(a, b, OP_SUB, OC_SUBI, OC_SUBF);
 }
 ExprResult eval_mul(ExprResult a, ExprResult b) {
+    log_production("Evaluating MUL");
     return eval_arithmetic_pipeline(a, b, OP_MUL, OC_MULI, OC_MULF);
 }
 ExprResult eval_div(ExprResult a, ExprResult b) {
+    log_production("Evaluating DIV");
     return eval_arithmetic_pipeline(a, b, OP_DIV, OC_DIVI, OC_DIVF);
 }
 ExprResult eval_mod(ExprResult a, ExprResult b) {
+    log_production("Evaluating MOD");
     return eval_arithmetic_pipeline(a, b, OP_MOD, OC_MODI, "");
 }
 ExprResult eval_pow(ExprResult a, ExprResult b) {
+    log_production("Evaluating POW");
     return eval_arithmetic_pipeline(a, b, OP_POW, "", "");
 }
 
@@ -62,6 +68,7 @@ ExprResult eval_cast(DATA_TYPE target_type, ExprResult expr) {
 }
 
 ExprResult eval_unary_minus(ExprResult a) {
+    log_production("Evaluating Unary minus");
     ExprResult res = {TYPE_VOID};
     if (!is_numeric(&a)) {
         if (a.addr) free(a.addr);
@@ -94,4 +101,4 @@ ExprResult eval_unary_minus(ExprResult a) {
     return res;
 }
 
-ExprResult eval_unary_plus(ExprResult a) { return a; }
+ExprResult eval_unary_plus(ExprResult a) { log_production("Evaluating Unary plus"); return a; }

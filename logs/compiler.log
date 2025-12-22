@@ -1,32 +1,120 @@
 --- START OF ANALYSIS ---
 [PROD] Type: int
-[PROD] Declared VAR: 'y' (Type: INT)
-[PROD] Declared VAR: 'x' (Type: INT)
-[PROD] Assignment: 'x' := 1
-[PROD] Assignment: 'y' := 1
+[PROD] Declared VAR: 'k' (Type: INT)
+[PROD] Declared VAR: 'j' (Type: INT)
+[PROD] Declared VAR: 'i' (Type: INT)
+[PROD] Type: float
+[PROD] Declared VAR: 'z' (Type: FLOAT)
+[PROD] Declared VAR: 'y' (Type: FLOAT)
+[PROD] Declared VAR: 'x' (Type: FLOAT)
+[PROD] Assignment: 'i' := 2
+[PROD] Assignment: 'j' := 3
+[PROD] Assignment: 'k' := 4
+[PROD] Assignment: 'x' := 1.5
+[PROD] Assignment: 'y' := 0.5
+[PROD] Expression: Identifier 'j' -> Type: INT
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Skipped full comment line
+[PROD] Expression: Identifier 'j' -> Type: INT
+[PROD] Evaluating POW
+[PROD] Generating code
+[PROD] Generating runtime loop for POW
+[PROD] Evaluating MUL
+[PROD] Generating code
+[PROD] Evaluating ADD
+[PROD] Generating code
+[PROD] Assignment: 'i' := $t01
+[PROD] Skipped full comment line
+[PROD] Evaluating POW
+[PROD] Optimization: Constant Folding applied
+[PROD] Evaluating POW
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'k' := 512
+[PROD] Expression: Identifier 'k' -> Type: INT
+[PROD] Evaluating MUL
+[PROD] Generating code
+[PROD] Skipped full comment line
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Evaluating DIV
+[PROD] Generating code
+[PROD] Assignment: 'j' := $t01
+[PROD] Expression: Identifier 'j' -> Type: INT
+[PROD] Evaluating MOD
+[PROD] Generating code
+[PROD] Skipped full comment line
+[PROD] Expression: Identifier 'k' -> Type: INT
+[PROD] Evaluating MUL
+[PROD] Generating code
+[PROD] Assignment: 'k' := $t01
+[PROD] Skipped full comment line
+[PROD] Evaluating Unary minus
 [PROD] Optimization: Constant Folding Unary Minus
-[PROD] Control: Repeat Start (Count 0 to -2)
-[PROD] Marker M: Label 4
-[PROD] Type: int
-[PROD] Declared VAR: 'z' (Type: INT)
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Assignment: 'z' := x
-[PROD] Control: Repeat Start (Count 0 to 3)
-[PROD] Marker M: Label 6
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Strength Reduction: x * 2 -> x + x
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'i' := 8
+[PROD] Skipped full comment line
+[PROD] Evaluating Unary minus
+[PROD] Optimization: Constant Folding Unary Minus
+[PROD] Evaluating SUB
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'j' := 12
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Evaluating Unary minus
+[PROD] Expression: Parenthesized
+[PROD] Skipped full comment line
+[PROD] Evaluating MUL
 [PROD] Generating code
-[PROD] Assignment: 'y' := $t03
-[PROD] Control: Repeat End
-[PROD] Expression: Identifier 'x' -> Type: INT
+[PROD] Assignment: 'k' := $t01
+[PROD] Expression: Identifier 'i' -> Type: INT
+[PROD] Evaluating Unary plus
+[PROD] Expression: Parenthesized
+[PROD] Skipped full comment line
+[PROD] Evaluating DIV
 [PROD] Generating code
-[PROD] Assignment: 'x' := $t02
-[PROD] Expression: Identifier 'y' -> Type: INT
-[PROD] Expression: Identifier 'x' -> Type: INT
-[PROD] Generating code
-[PROD] Assignment: 'y' := $t02
-[PROD] Control: Repeat End
-[PROD] Multiline comment start on row: 14 col: 0
+[PROD] Assignment: 'i' := $t01
+[PROD] Evaluating Unary minus
+[PROD] Optimization: Constant Folding Unary Minus
+[PROD] Skipped full comment line
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'j' := -5
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Expression: Parenthesized
+[PROD] Skipped full comment line
+[PROD] Evaluating MUL
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'i' := 36
+[PROD] Evaluating MUL
+[PROD] Optimization: Constant Folding applied
+[PROD] Expression: Parenthesized
+[PROD] Skipped full comment line
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Assignment: 'j' := 16
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Expression: Parenthesized
+[PROD] Skipped full comment line
+[PROD] Evaluating Unary minus
+[PROD] Optimization: Constant Folding Unary Minus
+[PROD] Assignment: 'k' := -12
+[PROD] Skipped full comment line
+[PROD] Skipped full comment line
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Recovered from item list error, skipping item.
+[PROD] Evaluating MUL
+[PROD] Optimization: Constant Folding applied
+[PROD] Skipped full comment line
+[PROD] Recovered from item list error, skipping item.
+[PROD] Evaluating ADD
+[PROD] Optimization: Constant Folding applied
+[PROD] Expression: Parenthesized
+[PROD] Assignment: 'i' := 5
+[PROD] Skipped full comment line
+[PROD] Recovered from item list error, skipping item.
+[PROD] Multiline comment start on row: 31 col: 0
 [PROD] Multicomment skipping characters
-[PROD] Multiline comment closed on row: 31 col: 0
+[PROD] Multiline comment closed on row: 66 col: 0
 --- END OF ANALYSIS ---

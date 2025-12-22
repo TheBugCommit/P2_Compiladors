@@ -33,7 +33,7 @@ ExprResult calculate_array_offset(sym_value_type* entry, ExprResult index_expr,
 
     ExprResult base_lit = make_literal_result(TYPE_INT, entry->base_addr);
     ExprResult final_offset =
-        eval_add(base_lit, rel_offset);  // TODO: Sobra o no?
+        eval_add(base_lit, rel_offset);
 
     return final_offset;
 }

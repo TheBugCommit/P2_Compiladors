@@ -42,10 +42,6 @@
 #define REL_GEF     "GEF"
 #define REL_LEF     "LEF"
 
-#define REL_SUFFIX_I   "I"
-#define REL_SUFFIX_F   "F"
-#define REL_APPEND(str, suf)  str suf
-
 #define PROC_PUTI   "PUTI"
 #define PROC_PUTF   "PUTF"
 
